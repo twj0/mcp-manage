@@ -47,7 +47,7 @@ npm start
   "mcpServers": {
     "mcp-manager": {
       "command": "node",
-      "args": ["D:\\path\\to\\mcp-manage\\src\\server.js"]
+      "args": ["D:\\path\\to\\mcp-manage\\bin\\mcp-server.js"]
     }
   }
 }
@@ -61,7 +61,7 @@ npm start
   "mcpServers": {
     "mcp-manager": {
       "command": "node",
-      "args": ["/path/to/mcp-manage/src/server.js"]
+      "args": ["/path/to/mcp-manage/bin/mcp-server.js"]
     }
   }
 }
@@ -82,7 +82,7 @@ npm start
   "mcpServers": {
     "mcp-manager": {
       "command": "node",
-      "args": ["D:\\MCP\\mcp-manage\\src\\server.js"]
+      "args": ["D:\\MCP\\mcp-manage\\bin\\mcp-server.js"]
     }
   }
 }

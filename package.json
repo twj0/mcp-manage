@@ -5,17 +5,17 @@
   "type": "module",
   "main": "index.js",
   "bin": {
-    "mcp-manager": "./bin/mcp-manager.js",
-    "mcp-server": "./src/server.js"
+    "mcp-manager": "./index.js",
+    "mcp-server": "./bin/mcp-server.js"
   },
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "mcp": "node src/server.js",
-    "mcp-proxy": "node start-mcp-proxy.js",
-    "test": "node test-proxy.js",
-    "test-proxy": "node test-proxy.js",
-    "verify-config": "node verify-config.js",
+    "mcp": "node bin/mcp-server.js",
+    "mcp-proxy": "node scripts/start-mcp-proxy.js",
+    "test": "node scripts/test-proxy.js",
+    "test-proxy": "node scripts/test-proxy.js",
+    "verify-config": "node scripts/verify-config.js",
     "build": "echo 'No build step required for Node.js application'",
     "lint": "echo 'ESLint not configured yet'",
     "clean": "rimraf node_modules package-lock.json",
@@ -60,5 +60,4 @@
     "url": "https://github.com/twj0/mcp-manage/issues"
   },
   "homepage": "https://github.com/twj0/mcp-manage#readme"
-}
 }

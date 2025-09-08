@@ -43,7 +43,7 @@ class McpManagerServer {
 
   async loadConfig() {
     try {
-      const configPath = join(__dirname, 'config.json');
+      const configPath = join(__dirname, '../config.json');
       const configData = await fs.readFile(configPath, 'utf8');
       this.config = JSON.parse(configData);
       console.error('Loaded config with servers:', Object.keys(this.config.mcpServers || {}));
@@ -278,7 +278,7 @@ class McpManagerServer {
       if (toolName === 'launch_manager') {
         // 启动管理界面
         const { exec } = await import('child_process');
-        const serverPath = join(__dirname, 'server.js');
+        const serverPath = join(__dirname, '../index.js');
         exec(`node ${serverPath}`, (error, stdout, stderr) => {
           if (error) {
             console.error(`Error: ${error}`);

@@ -97,7 +97,7 @@ router.get('/cursor-config', async (req, res) => {
     console.log('Handling /api/cursor-config request');
     try {
         const savedConfig = await readConfigFile(CURSOR_CONFIG_PATH);
-        const defaultConfig = await readConfigFile(path.join(__dirname, 'config.json'));
+        const defaultConfig = await readConfigFile(path.join(__dirname, '../../config.json'));
         const mergedConfig = mergeConfigs(savedConfig, defaultConfig.mcpServers || {});
         console.log('Returning merged config with servers:', Object.keys(mergedConfig.mcpServers));
         res.json(mergedConfig);
@@ -124,7 +124,7 @@ router.get('/tools', async (req, res) => {
     console.log('Handling /api/tools request');
     try {
         const cursorConfig = await readConfigFile(CURSOR_CONFIG_PATH);
-        const defaultConfig = await readConfigFile(path.join(__dirname, 'config.json'));
+        const defaultConfig = await readConfigFile(path.join(__dirname, '../../config.json'));
         const mergedConfig = mergeConfigs(cursorConfig, defaultConfig.mcpServers || {});
         const servers = mergedConfig.mcpServers;
 
@@ -171,7 +171,7 @@ router.post('/save-configs', async (req, res) => {
         }
 
         // Save to local config.json first
-        const localConfigPath = path.join(__dirname, 'config.json');
+        const localConfigPath = path.join(__dirname, '../../config.json');
         const localConfig = { mcpServers };
         await fs.writeFile(localConfigPath, JSON.stringify(localConfig, null, 2));
 

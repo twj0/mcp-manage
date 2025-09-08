@@ -10,8 +10,8 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 async function checkAndInstallDependencies() {
-  const packageJsonPath = join(__dirname, 'package.json');
-  const nodeModulesPath = join(__dirname, 'node_modules', '@modelcontextprotocol');
+  const packageJsonPath = join(__dirname, '../package.json');
+  const nodeModulesPath = join(__dirname, '../node_modules', '@modelcontextprotocol');
   
   // 检查是否已安装 MCP SDK
   if (!existsSync(nodeModulesPath)) {
@@ -20,7 +20,7 @@ async function checkAndInstallDependencies() {
     return new Promise((resolve, reject) => {
       const npm = process.platform === 'win32' ? 'npm.cmd' : 'npm';
       const installProcess = spawn(npm, ['install'], {
-        cwd: __dirname,
+        cwd: join(__dirname, '..'),
         stdio: 'inherit'
       });
       
@@ -43,13 +43,13 @@ async function startMcpServer() {
     await checkAndInstallDependencies();
     
     // 动态导入 MCP 服务器
-    const { default: mcpServerModule } = await import('./mcp-server.js');
+    const { default: mcpServerModule } = await import('../bin/mcp-server.js');
     
   } catch (error) {
     console.error('启动 MCP 代理服务器失败:', error);
     
     // 如果动态导入失败，尝试直接执行
-    const serverPath = join(__dirname, 'mcp-server.js');
+    const serverPath = join(__dirname, '../bin/mcp-server.js');
     const node = spawn('node', [serverPath], {
       stdio: 'inherit'
     });
