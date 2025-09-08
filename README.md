@@ -50,7 +50,8 @@ Run on your local computer and access via your local IP address:
       "args": ["D:\\path\\to\\mcp-manage\\bin\\mcp-server.js"]
     }
   }
-}```
+}
+```
 
 ### 2. Remote VPS Deployment
 Run on a remote server and access via the remote IP + port 3456:
