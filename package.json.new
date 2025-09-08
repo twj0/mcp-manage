@@ -1,0 +1,92 @@
+{
+  "name": "mcp-manager",
+  "version": "1.1.0",
+  "description": "A web-based GUI tool for managing Model Context Protocol (MCP) servers in Claude and Cursor",
+  "type": "module",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js --watch src",
+    "build": "node scripts/build.js",
+    "test": "node --test tests/**/*.test.js",
+    "test:unit": "node --test tests/unit/**/*.test.js",
+    "test:integration": "node --test tests/integration/**/*.test.js",
+    "lint": "eslint src/ --ext .js",
+    "lint:fix": "eslint src/ --ext .js --fix",
+    "format": "prettier --write src/**/*.js public/**/*.js",
+    "validate": "npm run lint && npm run test",
+    "mcp": "node src/mcp-server.js",
+    "mcp-proxy": "node scripts/start-mcp-proxy.js",
+    "verify-config": "node scripts/verify-config.js",
+    "docs": "jsdoc src/ -d docs/api",
+    "clean": "rimraf docs/api lib dist",
+    "precommit": "npm run lint && npm run test"
+  },
+  "keywords": [
+    "mcp",
+    "claude",
+    "anthropic",
+    "cursor",
+    "ai",
+    "model-context-protocol",
+    "server-management",
+    "gui",
+    "tool-management"
+  ],
+  "author": "MCP Manager Team",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "@modelcontextprotocol/sdk": "^0.4.0",
+    "axios": "^1.6.0",
+    "joi": "^17.11.0",
+    "winston": "^3.11.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1",
+    "eslint": "^8.55.0",
+    "prettier": "^3.1.0",
+    "jsdoc": "^4.0.2",
+    "rimraf": "^5.0.5"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yourusername/mcp-manager.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/mcp-manager/issues"
+  },
+  "homepage": "https://github.com/yourusername/mcp-manager#readme",
+  "nodemonConfig": {
+    "watch": ["src/"],
+    "ext": "js,json",
+    "ignore": ["tests/", "node_modules/"]
+  },
+  "eslintConfig": {
+    "env": {
+      "node": true,
+      "es2022": true
+    },
+    "extends": ["eslint:recommended"],
+    "parserOptions": {
+      "ecmaVersion": "latest",
+      "sourceType": "module"
+    },
+    "rules": {
+      "no-console": "warn",
+      "no-unused-vars": "error",
+      "prefer-const": "error",
+      "no-var": "error"
+    }
+  },
+  "prettier": {
+    "semi": true,
+    "singleQuote": true,
+    "tabWidth": 2,
+    "trailingComma": "es5"
+  }
+}

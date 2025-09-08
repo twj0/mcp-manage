@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MCP Server Manager</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>MCP Server Manager</h1>
+        
+        <!-- Messages -->
+        <div id="errorMessage" class="message error" style="display: none;"></div>
+        <div id="successMessage" class="message success" style="display: none;"></div>
+        
+        <!-- Navigation -->
+        <div class="tabs">
+            <button class="tab active" onclick="showView('servers', this)">Servers</button>
+            <button class="tab" onclick="showView('tools', this)">Tools</button>
+            <button class="tab" onclick="showView('add', this)">Add Server</button>
+        </div>
+
+        <!-- Add Server View -->
+        <div id="addView" style="display: none;">
+            <div class="add-server-form">
+                <h2>Add New MCP Server</h2>
+                <form id="addServerForm">
+                    <div class="form-group">
+                        <label for="serverName">Server Name</label>
+                        <input type="text" id="serverName" name="serverName" required placeholder="e.g., my-server">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="configMode">Configuration Mode</label>
+                        <select id="configMode" name="configMode" onchange="toggleConfigMode()">
+                            <option value="form">Form Input</option>
+                            <option value="template">Use Template</option>
+                            <option value="json">JSON Input</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Template Selection Mode -->
+                    <div id="templateMode" style="display: none;">
+                        <div class="form-group">
+                            <label for="templateSelect">Choose Template</label>
+                            <select id="templateSelect" name="templateSelect" onchange="loadTemplate()">
+                                <option value="">Select a template...</option>
+                            </select>
+                        </div>
+                        <div id="templateDescription" class="template-description"></div>
+                    </div>
+                    
+                    <!-- Form Input Mode -->
+                    <div id="formInputMode">
+                        <div class="form-group">
+                            <label for="connectionType">Connection Type</label>
+                            <select id="connectionType" name="connectionType" onchange="toggleConnectionType()">
+                                <option value="stdio">Local Process (stdio)</option>
+                                <option value="sse">Server-Sent Events (SSE)</option>
+                                <option value="websocket">WebSocket</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Local Process Configuration -->
+                        <div id="stdioConfig">
+                            <div class="form-group">
+                                <label for="commandType">Command Type</label>
+                                <select id="commandType" name="commandType" onchange="toggleCommandType()">
+                                    <option value="node">Node.js</option>
+                                    <option value="python">Python</option>
+                                    <option value="uvx">UVX</option>
+                                    <option value="docker">Docker</option>
+                                    <option value="custom">Custom Command</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="serverCommand">Command</label>
+                                <input type="text" id="serverCommand" name="serverCommand" placeholder="Will be auto-filled based on command type">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="serverArgs">Arguments</label>
+                                <textarea id="serverArgs" name="serverArgs" placeholder="One argument per line, e.g.:\n/path/to/server.js\n--option=value"></textarea>
+                            </div>
+                        </div>
+                        
+                        <!-- Remote Connection Configuration -->
+                        <div id="remoteConfig" style="display: none;">
+                            <div class="form-group">
+                                <label for="serverUrl">Server URL</label>
+                                <input type="url" id="serverUrl" name="serverUrl" placeholder="e.g., https://api.example.com/mcp or ws://localhost:8080">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="authType">Authentication</label>
+                                <select id="authType" name="authType">
+                                    <option value="none">None</option>
+                                    <option value="bearer">Bearer Token</option>
+                                    <option value="apikey">API Key</option>
+                                    <option value="basic">Basic Auth</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group" id="authConfig" style="display: none;">
+                                <label for="authValue">Authentication Value</label>
+                                <input type="password" id="authValue" name="authValue" placeholder="Token, API key, or username:password">
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Environment Variables</label>
+                            <div id="envVars">
+                                <div class="env-var-input">
+                                    <input type="text" placeholder="Variable name" class="env-key">
+                                    <input type="text" placeholder="Variable value" class="env-value">
+                                    <button type="button" onclick="removeEnvVar(this)">Remove</button>
+                                </div>
+                            </div>
+                            <button type="button" onclick="addEnvVar()">Add Environment Variable</button>
+                        </div>
+                    </div>
+                    
+                    <!-- JSON Input Mode -->
+                    <div id="jsonInputMode" style="display: none;">
+                        <div class="form-group">
+                            <label for="jsonConfig">JSON Configuration</label>
+                            <textarea id="jsonConfig" name="jsonConfig" rows="15" placeholder='{
+  "command": "node",
+  "args": ["/path/to/server.js"],
+  "env": {
+    "API_KEY": "your-api-key"
+  }
+}'></textarea>
+                            <small>Enter the complete server configuration in JSON format</small>
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="submit">Add Server</button>
+                        <button type="button" onclick="clearForm()">Clear</button>
+                        <button type="button" onclick="validateJson()" id="validateJsonBtn" style="display: none;">Validate JSON</button>
+                    </div>
+                </form>
+                
+                <!-- Command Examples -->
+                <div class="command-examples">
+                    <h4>Command Examples</h4>
+                    <div>
+                        <strong>Node.js:</strong>
+                        <pre>Command: node
+Args: /path/to/server.js</pre>
+                    </div>
+                    <div>
+                        <strong>Python:</strong>
+                        <pre>Command: python
+Args: /path/to/server.py</pre>
+                    </div>
+                    <div>
+                        <strong>UVX:</strong>
+                        <pre>Command: uvx
+Args: mcp-server-brave-search</pre>
+                    </div>
+                    <div>
+                        <strong>Docker:</strong>
+                        <pre>Command: docker
+Args: run
+--rm
+-i
+your-image:latest
+/app/server</pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Servers View -->
+        <div id="serversView" class="grid">
+            <!-- Server cards will be dynamically added here -->
+        </div>
+
+        <!-- Tools View -->
+        <div id="toolsView" style="display: none;">
+            <!-- Tools will be dynamically added here -->
+        </div>
+
+        <!-- Save Button -->
+        <button class="save-button" onclick="saveChanges()">Save Changes</button>
+        
+        <!-- Delete Confirmation Modal -->
+        <div id="deleteModal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <h3>Confirm Delete</h3>
+                <p>Are you sure you want to delete this MCP server?</p>
+                <div class="modal-actions">
+                    <button onclick="confirmDelete()">Delete</button>
+                    <button onclick="closeDeleteModal()">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

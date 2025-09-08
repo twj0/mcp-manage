@@ -1,0 +1,26 @@
+{
+  "name": "feedback-enhance-mcp-server",
+  "version": "1.0.0",
+  "description": "Feedback Enhancement MCP Server for analyzing and improving feedback quality",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "keywords": [
+    "mcp",
+    "feedback",
+    "enhancement",
+    "analysis",
+    "ai"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^0.4.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}

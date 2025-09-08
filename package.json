@@ -1,0 +1,64 @@
+{
+  "name": "mcp-manager",
+  "version": "1.0.0",
+  "description": "一个基于Web的GUI工具，用于管理Claude和Cursor中的Model Context Protocol (MCP)服务器。支持本地和远程部署，提供统一的MCP服务器代理功能。",
+  "type": "module",
+  "main": "index.js",
+  "bin": {
+    "mcp-manager": "./bin/mcp-manager.js",
+    "mcp-server": "./src/server.js"
+  },
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "mcp": "node src/server.js",
+    "mcp-proxy": "node start-mcp-proxy.js",
+    "test": "node test-proxy.js",
+    "test-proxy": "node test-proxy.js",
+    "verify-config": "node verify-config.js",
+    "build": "echo 'No build step required for Node.js application'",
+    "lint": "echo 'ESLint not configured yet'",
+    "clean": "rimraf node_modules package-lock.json",
+    "reinstall": "npm run clean && npm install"
+  },
+  "keywords": [
+    "mcp",
+    "claude",
+    "anthropic",
+    "cursor",
+    "ai",
+    "model-context-protocol",
+    "server-management",
+    "gui",
+    "proxy",
+    "remote",
+    "web-interface",
+    "tool-management"
+  ],
+  "author": "MCP Manager Team",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^0.4.0",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "helmet": "^7.1.0",
+    "compression": "^1.7.4"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1",
+    "rimraf": "^5.0.5"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/twj0/mcp-manage.git"
+  },
+  "bugs": {
+    "url": "https://github.com/twj0/mcp-manage/issues"
+  },
+  "homepage": "https://github.com/twj0/mcp-manage#readme"
+}
+}

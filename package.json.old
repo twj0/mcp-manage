@@ -1,0 +1,44 @@
+{
+  "name": "mcp-manager",
+  "version": "1.0.0",
+  "description": "A web-based GUI tool for managing Model Context Protocol (MCP) servers in Claude and Cursor",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "mcp": "node mcp-server.js",
+    "mcp-proxy": "node start-mcp-proxy.js",
+    "test": "node test-proxy.js",
+    "test-proxy": "node test-proxy.js",
+    "verify-config": "node verify-config.js"
+  },
+  "keywords": [
+    "mcp",
+    "claude",
+    "anthropic",
+    "cursor",
+    "ai",
+    "model-context-protocol",
+    "server-management",
+    "gui"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^0.4.0",
+    "cors": "^2.8.5",
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yourusername/mcp-manager.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/mcp-manager/issues"
+  },
+  "homepage": "https://github.com/yourusername/mcp-manager#readme"
+}

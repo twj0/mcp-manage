@@ -1,0 +1,202 @@
+{
+  "templates": {
+    "node-local": {
+      "name": "Node.js Local Server",
+      "description": "本地 Node.js MCP 服务器 - 适用于运行基于 Node.js 的 MCP 工具",
+      "category": "development",
+      "tags": ["node", "local", "development"],
+      "use_cases": ["自定义工具开发", "本地服务集成", "开发环境测试"],
+      "config": {
+        "command": "node",
+        "args": ["/path/to/server.js"],
+        "env": {
+          "API_KEY": "your-api-key-here"
+        }
+      }
+    },
+    "python-local": {
+      "name": "Python Local Server", 
+      "description": "Local Python MCP server",
+      "config": {
+        "command": "python",
+        "args": ["/path/to/server.py"],
+        "env": {
+          "API_KEY": "your-api-key-here"
+        }
+      }
+    },
+    "uvx-package": {
+      "name": "UVX Package",
+      "description": "Run MCP server via UVX package manager",
+      "config": {
+        "command": "uvx",
+        "args": ["package-name", "--arg1", "value1"],
+        "env": {
+          "API_KEY": "your-api-key-here"
+        }
+      }
+    },
+    "docker-container": {
+      "name": "Docker Container",
+      "description": "Run MCP server in Docker container",
+      "config": {
+        "command": "docker",
+        "args": [
+          "run",
+          "--rm",
+          "-i",
+          "--env-file", ".env",
+          "your-image:latest",
+          "/app/server"
+        ],
+        "env": {
+          "API_KEY": "your-api-key-here"
+        }
+      }
+    },
+    "sse-remote": {
+      "name": "SSE Remote Server",
+      "description": "Connect to remote MCP server via Server-Sent Events",
+      "config": {
+        "transport": "sse",
+        "url": "https://api.example.com/mcp/sse",
+        "auth": {
+          "type": "bearer",
+          "value": "your-bearer-token"
+        }
+      }
+    },
+    "websocket-remote": {
+      "name": "WebSocket Remote Server",
+      "description": "Connect to remote MCP server via WebSocket",
+      "config": {
+        "transport": "websocket",
+        "url": "wss://api.example.com/mcp/ws",
+        "auth": {
+          "type": "apikey",
+          "value": "your-api-key"
+        }
+      }
+    },
+    "brave-search": {
+      "name": "Brave Search",
+      "description": "Brave 搜索 API 集成 - 提供网络搜索和信息检索功能",
+      "category": "search",
+      "tags": ["search", "web", "information"],
+      "use_cases": ["网络搜索", "信息检索", "内容研究", "实时信息获取"],
+      "ai_prompt_hint": "当用户需要搜索网络信息、查找最新资讯或研究特定主题时使用",
+      "config": {
+        "command": "uvx",
+        "args": ["mcp-server-brave-search"],
+        "env": {
+          "BRAVE_API_KEY": "your-brave-api-key"
+        }
+      }
+    },
+    "github-integration": {
+      "name": "GitHub Integration",
+      "description": "GitHub API 集成 - 代码仓库管理、Issue 跟踪、PR 处理",
+      "category": "development",
+      "tags": ["git", "repository", "collaboration", "code"],
+      "use_cases": ["代码仓库管理", "Issue 创建和查询", "Pull Request 处理", "代码协作"],
+      "ai_prompt_hint": "当需要管理 GitHub 仓库、创建 Issue、处理 PR 或查看代码时使用",
+      "config": {
+        "command": "node",
+        "args": ["/path/to/github-mcp/dist/index.js"],
+        "env": {
+          "GITHUB_PERSONAL_ACCESS_TOKEN": "your-github-token"
+        }
+      }
+    },
+    "filesystem-access": {
+      "name": "Filesystem Access",
+      "description": "Local filesystem access MCP server",
+      "config": {
+        "command": "node",
+        "args": [
+          "/path/to/filesystem-mcp/dist/index.js",
+          "/allowed/directory/path"
+        ]
+      }
+    },
+    "google-maps": {
+      "name": "Google Maps",
+      "description": "Google Maps API integration",
+      "config": {
+        "command": "node",
+        "args": ["/path/to/google-maps-mcp/dist/index.js"],
+        "env": {
+          "GOOGLE_MAPS_API_KEY": "your-google-maps-api-key"
+        }
+      }
+    },
+    "local-ai-ollama": {
+      "name": "Local AI (Ollama)",
+      "description": "Connect to local Ollama AI server",
+      "config": {
+        "command": "node",
+        "args": ["/path/to/local-ai-mcp/index.js"],
+        "env": {
+          "LOCAL_AI_BASE_URL": "http://localhost:11434",
+          "LOCAL_AI_MODEL": "llama2",
+          "LOCAL_AI_API_KEY": ""
+        }
+      }
+    },
+    "local-ai-localai": {
+      "name": "Local AI (LocalAI)",
+      "description": "Connect to LocalAI server",
+      "config": {
+        "command": "node",
+        "args": ["/path/to/local-ai-mcp/index.js"],
+        "env": {
+          "LOCAL_AI_BASE_URL": "http://localhost:8080",
+          "LOCAL_AI_MODEL": "ggml-gpt4all-j",
+          "LOCAL_AI_API_KEY": ""
+        }
+      }
+    },
+    "local-ai-lmstudio": {
+      "name": "Local AI (LM Studio)",
+      "description": "Connect to LM Studio local server",
+      "config": {
+        "command": "node",
+        "args": ["/path/to/local-ai-mcp/index.js"],
+        "env": {
+          "LOCAL_AI_BASE_URL": "http://localhost:1234",
+          "LOCAL_AI_MODEL": "llama-2-7b-chat",
+          "LOCAL_AI_API_KEY": ""
+        }
+      }
+    },
+    "feedback-enhance": {
+      "name": "Feedback Enhancement Tool",
+      "description": "AI 反馈分析和增强工具 - 分析反馈质量、提供改进建议、生成专业反馈模板",
+      "category": "communication",
+      "tags": ["feedback", "analysis", "enhancement", "communication"],
+      "use_cases": ["反馈质量分析", "反馈内容增强", "团队沟通改进", "代码审查反馈"],
+      "ai_prompt_hint": "当需要分析或改进反馈内容、提升沟通质量或生成专业反馈时使用",
+      "config": {
+        "command": "uvx",
+        "args": ["mcp-feedback-enhance"],
+        "env": {
+          "OPENAI_API_KEY": "your-openai-api-key",
+          "FEEDBACK_MODEL": "gpt-4",
+          "ENHANCEMENT_MODE": "detailed"
+        }
+      }
+    },
+    "feedback-enhance-local": {
+      "name": "Local Feedback Enhancement",
+      "description": "Local feedback enhancement with custom AI models",
+      "config": {
+        "command": "node",
+        "args": ["/path/to/feedback-enhance-mcp/index.js"],
+        "env": {
+          "LOCAL_AI_URL": "http://localhost:8080",
+          "FEEDBACK_ENHANCEMENT_MODEL": "gpt-3.5-turbo"
+        }
+      }
+    }
+  }
+}
