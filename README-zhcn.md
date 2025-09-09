@@ -52,7 +52,7 @@ npm install
 
 3. 创建配置文件：
 ```bash
-cp config.example.json config.json
+cp config/config.example.json config.json
 ```
 
 4. 启动服务器：

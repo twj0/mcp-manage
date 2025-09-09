@@ -31,7 +31,7 @@ cd mcp-manage
 npm install
 
 # Create a configuration file
-cp config.example.json config.json
+cp config/config.example.json config.json
 
 # Start the service
 npm start
