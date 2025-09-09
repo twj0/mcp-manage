@@ -34,24 +34,28 @@ echo -e "\n${YELLOW}--- 步骤 2: 从 GitHub 克隆 mcp-manage 仓库 (使用大
 
 # 定义多个镜像源以提高成功率
 REPO_URLS=(
-    "https://github.com/twj0/mcp-manage.git"
-    "https://ghproxy.com/https://github.com/twj0/mcp-manage.git"
-    "https://ghproxy.cn/https://github.com/twj0/mcp-manage.git"
+    "https://ghfast.top/https://github.com/twj0/mcp-manage.git"
+    "https://gh-proxy.com/https://github.com/twj0/mcp-manage.git"
+    "https://gh-proxy.cn/https://github.com/twj0/mcp-manage.git"
     "https://mirror.ghproxy.com/https://github.com/twj0/mcp-manage.git"
+    "https://gh.api.99988866.xyz/https://github.com/twj0/mcp-manage.git"
+    "https://gitclone.com/github.com/twj0/mcp-manage.git"
+    "https://hub.fgit.ml/twj0/mcp-manage.git"
+    "https://ghps.cc/https://github.com/twj0/mcp-manage.git"
 )
 INSTALL_DIR="mcp-manage"
 
 clone_repo() {
     local url=$1
     echo -e "${YELLOW}尝试使用镜像源: $url${NC}"
-    git clone --depth=1 --progress "$url" "$INSTALL_DIR"
+    timeout 60 git clone --depth=1 --progress "$url" "$INSTALL_DIR"
     return $?
 }
 
 update_repo() {
     echo -e "${YELLOW}是 Git 仓库。尝试更新...${NC}"
     cd "$INSTALL_DIR" || return 1
-    git pull
+    timeout 60 git pull
     return $?
 }
 
@@ -61,6 +65,8 @@ if [ -d "$INSTALL_DIR" ]; then
         update_repo
         if [ $? -ne 0 ]; then
             echo -e "${RED}git pull 失败。请检查错误信息。可能需要手动解决。${NC}"
+            echo -e "${YELLOW}建议手动运行以下命令:${NC}"
+            echo -e "${YELLOW}  cd $INSTALL_DIR && git pull${NC}"
             exit 1
         fi
     else
@@ -76,6 +82,10 @@ if [ -d "$INSTALL_DIR" ]; then
         
         if [ "$cloned" = false ]; then
             echo -e "${RED}所有镜像源都克隆失败。请检查网络连接或稍后重试。${NC}"
+            echo -e "${YELLOW}建议手动尝试以下命令:${NC}"
+            for url in "${REPO_URLS[@]}"; do
+                echo -e "${YELLOW}  git clone --depth=1 $url mcp-manage${NC}"
+            done
             exit 1
         fi
         cd "$INSTALL_DIR" || exit
@@ -90,6 +100,10 @@ else
     
     if [ "$cloned" = false ]; then
         echo -e "${RED}所有镜像源都克隆失败。请检查网络连接或稍后重试。${NC}"
+        echo -e "${YELLOW}建议手动尝试以下命令:${NC}"
+        for url in "${REPO_URLS[@]}"; do
+            echo -e "${YELLOW}  git clone --depth=1 $url mcp-manage${NC}"
+        done
         exit 1
     fi
     cd "$INSTALL_DIR" || exit
