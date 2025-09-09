@@ -31,14 +31,34 @@ echo -e "${GREEN}依赖检查通过。${NC}"
 
 # 步骤 2: 克隆仓库
 echo -e "\n${YELLOW}--- 步骤 2: 从 GitHub 克隆 mcp-manage 仓库 (使用大陆加速) ---${NC}"
-REPO_URL="https://ghproxy.com/https://github.com/twj0/mcp-manage.git"
+
+# 定义多个镜像源以提高成功率
+REPO_URLS=(
+    "https://github.com/twj0/mcp-manage.git"
+    "https://ghproxy.com/https://github.com/twj0/mcp-manage.git"
+    "https://ghproxy.cn/https://github.com/twj0/mcp-manage.git"
+    "https://mirror.ghproxy.com/https://github.com/twj0/mcp-manage.git"
+)
 INSTALL_DIR="mcp-manage"
+
+clone_repo() {
+    local url=$1
+    echo -e "${YELLOW}尝试使用镜像源: $url${NC}"
+    git clone --depth=1 --progress "$url" "$INSTALL_DIR"
+    return $?
+}
+
+update_repo() {
+    echo -e "${YELLOW}是 Git 仓库。尝试更新...${NC}"
+    cd "$INSTALL_DIR" || return 1
+    git pull
+    return $?
+}
+
 if [ -d "$INSTALL_DIR" ]; then
     echo -e "${YELLOW}目录 '$INSTALL_DIR' 已存在。正在检查是否为 Git 仓库...${NC}"
     if [ -d "$INSTALL_DIR/.git" ]; then
-        echo -e "${YELLOW}是 Git 仓库。尝试更新...${NC}"
-        cd "$INSTALL_DIR" || exit
-        git pull
+        update_repo
         if [ $? -ne 0 ]; then
             echo -e "${RED}git pull 失败。请检查错误信息。可能需要手动解决。${NC}"
             exit 1
@@ -46,17 +66,30 @@ if [ -d "$INSTALL_DIR" ]; then
     else
         echo -e "${RED}目录 '$INSTALL_DIR' 不是一个有效的 Git 仓库。将删除并重新克隆...${NC}"
         rm -rf "$INSTALL_DIR"
-        git clone --progress "$REPO_URL" "$INSTALL_DIR"
-        if [ $? -ne 0 ]; then
-            echo -e "${RED}git clone 失败。请检查网络连接或 URL 是否正确。${NC}"
+        
+        # 尝试不同的镜像源直到成功
+        cloned=false
+        for url in "${REPO_URLS[@]}"; do
+            clone_repo "$url" && cloned=true && break
+            echo -e "${RED}使用镜像源 $url 克隆失败，尝试下一个镜像源...${NC}"
+        done
+        
+        if [ "$cloned" = false ]; then
+            echo -e "${RED}所有镜像源都克隆失败。请检查网络连接或稍后重试。${NC}"
             exit 1
         fi
         cd "$INSTALL_DIR" || exit
     fi
 else
-    git clone --progress "$REPO_URL" "$INSTALL_DIR"
-    if [ $? -ne 0 ]; then
-        echo -e "${RED}git clone 失败。请检查网络连接或 URL 是否正确。${NC}"
+    # 尝试不同的镜像源直到成功
+    cloned=false
+    for url in "${REPO_URLS[@]}"; do
+        clone_repo "$url" && cloned=true && break
+        echo -e "${RED}使用镜像源 $url 克隆失败，尝试下一个镜像源...${NC}"
+    done
+    
+    if [ "$cloned" = false ]; then
+        echo -e "${RED}所有镜像源都克隆失败。请检查网络连接或稍后重试。${NC}"
         exit 1
     fi
     cd "$INSTALL_DIR" || exit
