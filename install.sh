@@ -71,7 +71,9 @@ update_repo() {
     echo -e "${YELLOW}是 Git 仓库。尝试更新...${NC}"
     cd "$INSTALL_DIR" || return 1
     timeout 60 git pull
-    return $?
+    local result=$?
+    cd - > /dev/null  # 返回原目录
+    return $result
 }
 
 if [ -d "$INSTALL_DIR" ]; then
@@ -101,7 +103,7 @@ if [ -d "$INSTALL_DIR" ]; then
             done
             exit 1
         fi
-        cd "$INSTALL_DIR" || exit
+        # The script will consistently cd into the directory in Step 3
     fi
 else
     # 尝试不同的镜像源直到成功
@@ -119,9 +121,9 @@ else
         done
         exit 1
     fi
-    cd "$INSTALL_DIR" || exit
+    # The script will consistently cd into the directory in Step 3
 fi
-echo -e "${GREEN}仓库已克隆/更新到 '$INSTALL_DIR' 目录。${NC}"
+echo -e "${GREEN}仓库已克隆/更新到 '$INSTALL_DIR' 目录。当前工作目录: $(pwd)${NC}"
 
 # 步骤 3: 安装依赖
 echo -e "\n${YELLOW}--- 步骤 3: 安装项目依赖 (npm install) ---${NC}"
