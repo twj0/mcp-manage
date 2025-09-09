@@ -11,7 +11,7 @@ command_exists() {
     command -v "$1" >/dev/null 2>&1
 }
 
-echo -e "${GREEN}### MCP Manager 一键安装脚本 ###${NC}"
+echo -e "${GREEN}### mcp-manage 一键安装脚本 ###${NC}"
 
 # 步骤 1: 检查依赖 (Git, Node.js, npm)
 echo -e "\n${YELLOW}--- 步骤 1: 检查系统依赖 ---${NC}"
@@ -30,8 +30,8 @@ fi
 echo -e "${GREEN}依赖检查通过。${NC}"
 
 # 步骤 2: 克隆仓库
-echo -e "\n${YELLOW}--- 步骤 2: 从 GitHub 克隆 mcp-manager 仓库 ---${NC}"
-REPO_URL="https://ghfast.top/https://github.com/twj0/mcp-manage.git"
+echo -e "\n${YELLOW}--- 步骤 2: 从 GitHub 克隆 mcp-manage 仓库 (使用大陆加速) ---${NC}"
+REPO_URL="https://ghproxy.com/https://github.com/twj0/mcp-manage.git"
 INSTALL_DIR="mcp-manage"
 if [ -d "$INSTALL_DIR" ]; then
     echo -e "${YELLOW}目录 '$INSTALL_DIR' 已存在。将尝试进入并更新...${NC}"
@@ -75,7 +75,7 @@ if [ $? -ne 0 ]; then
 fi
 
 echo -e "\n${GREEN}===================================================${NC}"
-echo -e "${GREEN}🎉 MCP Manager 安装并启动成功! 🎉${NC}"
+echo -e "${GREEN}🎉 mcp-manage 安装并启动成功! 🎉${NC}"
 echo -e "${GREEN}===================================================${NC}"
 echo -e "\n您现在可以通过以下方式管理服务:"
 echo -e "  - ${YELLOW}mcp-manager list${NC}    : 查看服务状态"
