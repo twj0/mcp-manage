@@ -144,9 +144,14 @@ echo -e "${GREEN}项目依赖安装成功。${NC}"
 # 步骤 4: 设置全局命令
 echo -e "\n${YELLOW}--- 步骤 4: 设置 'mcp-manager' 全局命令 (npm link) ---${NC}"
 # 需要 sudo 权限来创建符号链接
-if command_exists sudo; then
+if [ "$(id -u)" -eq 0 ]; then
+    # If running as root, no need for sudo
+    "$NPM_CMD" link
+elif command_exists sudo; then
+    # If not root, but sudo is available, use it
     sudo env "PATH=$PATH" "$NPM_CMD" link
 else
+    # Fallback for non-root without sudo (might fail, but worth a try)
     "$NPM_CMD" link
 fi
 if [ $? -ne 0 ]; then
