@@ -1,5 +1,4 @@
 #!/bin/bash
-set -x # 开启调试模式，打印每条执行的命令
 
 # 设置颜色变量
 GREEN='\033[0;32m'
@@ -47,7 +46,7 @@ if [ -d "$INSTALL_DIR" ]; then
     else
         echo -e "${RED}目录 '$INSTALL_DIR' 不是一个有效的 Git 仓库。将删除并重新克隆...${NC}"
         rm -rf "$INSTALL_DIR"
-        git clone "$REPO_URL" "$INSTALL_DIR"
+        git clone --progress "$REPO_URL" "$INSTALL_DIR"
         if [ $? -ne 0 ]; then
             echo -e "${RED}git clone 失败。请检查网络连接或 URL 是否正确。${NC}"
             exit 1
@@ -55,7 +54,7 @@ if [ -d "$INSTALL_DIR" ]; then
         cd "$INSTALL_DIR" || exit
     fi
 else
-    git clone "$REPO_URL" "$INSTALL_DIR"
+    git clone --progress "$REPO_URL" "$INSTALL_DIR"
     if [ $? -ne 0 ]; then
         echo -e "${RED}git clone 失败。请检查网络连接或 URL 是否正确。${NC}"
         exit 1
