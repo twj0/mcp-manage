@@ -11,6 +11,19 @@ command_exists() {
     command -v "$1" >/dev/null 2>&1
 }
 
+# 查找npm路径
+find_npm() {
+    if command_exists npm; then
+        echo "npm"
+    elif [ -x "/usr/local/bin/npm" ]; then
+        echo "/usr/local/bin/npm"
+    elif [ -x "/usr/bin/npm" ]; then
+        echo "/usr/bin/npm"
+    else
+        return 1
+    fi
+}
+
 echo -e "${GREEN}### mcp-manage 一键安装脚本 ###${NC}"
 
 # 步骤 1: 检查依赖 (Git, Node.js, npm)
@@ -23,11 +36,13 @@ if ! command_exists node; then
     echo -e "${RED}错误: Node.js 未安装。请先安装 Node.js (建议 v18+) 再运行此脚本。${NC}"
     exit 1
 fi
-if ! command_exists npm; then
-    echo -e "${RED}错误: npm 未安装。请确保您的 Node.js 安装包含了 npm。${NC}"
+
+NPM_CMD=$(find_npm)
+if [ $? -ne 0 ]; then
+    echo -e "${RED}错误: npm 未安装或未找到。请确保您的 Node.js 安装包含了 npm。${NC}"
     exit 1
 fi
-echo -e "${GREEN}依赖检查通过。${NC}"
+echo -e "${GREEN}依赖检查通过。使用 npm 路径: $NPM_CMD${NC}"
 
 # 步骤 2: 克隆仓库
 echo -e "\n${YELLOW}--- 步骤 2: 从 GitHub 克隆 mcp-manage 仓库 (使用大陆加速) ---${NC}"
@@ -35,8 +50,8 @@ echo -e "\n${YELLOW}--- 步骤 2: 从 GitHub 克隆 mcp-manage 仓库 (使用大
 # 定义多个镜像源以提高成功率
 REPO_URLS=(
     "https://ghfast.top/https://github.com/twj0/mcp-manage.git"
-    "https://gh-proxy.com/https://github.com/twj0/mcp-manage.git"
-    "https://gh-proxy.cn/https://github.com/twj0/mcp-manage.git"
+    "https://ghproxy.com/https://github.com/twj0/mcp-manage.git"
+    "https://ghproxy.cn/https://github.com/twj0/mcp-manage.git"
     "https://mirror.ghproxy.com/https://github.com/twj0/mcp-manage.git"
     "https://gh.api.99988866.xyz/https://github.com/twj0/mcp-manage.git"
     "https://gitclone.com/github.com/twj0/mcp-manage.git"
@@ -65,8 +80,6 @@ if [ -d "$INSTALL_DIR" ]; then
         update_repo
         if [ $? -ne 0 ]; then
             echo -e "${RED}git pull 失败。请检查错误信息。可能需要手动解决。${NC}"
-            echo -e "${YELLOW}建议手动运行以下命令:${NC}"
-            echo -e "${YELLOW}  cd $INSTALL_DIR && git pull${NC}"
             exit 1
         fi
     else
@@ -112,7 +125,14 @@ echo -e "${GREEN}仓库已克隆/更新到 '$INSTALL_DIR' 目录。${NC}"
 
 # 步骤 3: 安装依赖
 echo -e "\n${YELLOW}--- 步骤 3: 安装项目依赖 (npm install) ---${NC}"
-npm install
+# 确保进入项目目录
+if ! cd "$INSTALL_DIR"; then
+    echo -e "${RED}无法进入项目目录 '$INSTALL_DIR'${NC}"
+    exit 1
+fi
+echo -e "${YELLOW}当前工作目录: $(pwd)${NC}"
+
+"$NPM_CMD" install
 if [ $? -ne 0 ]; then
     echo -e "${RED}npm install 失败。请检查错误信息并重试。${NC}"
     exit 1
@@ -123,9 +143,9 @@ echo -e "${GREEN}项目依赖安装成功。${NC}"
 echo -e "\n${YELLOW}--- 步骤 4: 设置 'mcp-manager' 全局命令 (npm link) ---${NC}"
 # 需要 sudo 权限来创建符号链接
 if command_exists sudo; then
-    sudo npm link
+    sudo "$NPM_CMD" link
 else
-    npm link
+    "$NPM_CMD" link
 fi
 if [ $? -ne 0 ]; then
     echo -e "${RED}npm link 失败。请尝试使用 'sudo npm link' 或检查您的权限配置。${NC}"
