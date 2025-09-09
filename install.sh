@@ -34,11 +34,31 @@ echo -e "\n${YELLOW}--- 步骤 2: 从 GitHub 克隆 mcp-manage 仓库 (使用大
 REPO_URL="https://ghproxy.com/https://github.com/twj0/mcp-manage.git"
 INSTALL_DIR="mcp-manage"
 if [ -d "$INSTALL_DIR" ]; then
-    echo -e "${YELLOW}目录 '$INSTALL_DIR' 已存在。将尝试进入并更新...${NC}"
-    cd "$INSTALL_DIR" || exit
-    git pull
+    echo -e "${YELLOW}目录 '$INSTALL_DIR' 已存在。正在检查是否为 Git 仓库...${NC}"
+    if [ -d "$INSTALL_DIR/.git" ]; then
+        echo -e "${YELLOW}是 Git 仓库。尝试更新...${NC}"
+        cd "$INSTALL_DIR" || exit
+        git pull
+        if [ $? -ne 0 ]; then
+            echo -e "${RED}git pull 失败。请检查错误信息。可能需要手动解决。${NC}"
+            exit 1
+        fi
+    else
+        echo -e "${RED}目录 '$INSTALL_DIR' 不是一个有效的 Git 仓库。将删除并重新克隆...${NC}"
+        rm -rf "$INSTALL_DIR"
+        git clone "$REPO_URL" "$INSTALL_DIR"
+        if [ $? -ne 0 ]; then
+            echo -e "${RED}git clone 失败。请检查网络连接或 URL 是否正确。${NC}"
+            exit 1
+        fi
+        cd "$INSTALL_DIR" || exit
+    fi
 else
     git clone "$REPO_URL" "$INSTALL_DIR"
+    if [ $? -ne 0 ]; then
+        echo -e "${RED}git clone 失败。请检查网络连接或 URL 是否正确。${NC}"
+        exit 1
+    fi
     cd "$INSTALL_DIR" || exit
 fi
 echo -e "${GREEN}仓库已克隆/更新到 '$INSTALL_DIR' 目录。${NC}"
