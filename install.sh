@@ -31,7 +31,7 @@ echo -e "${GREEN}依赖检查通过。${NC}"
 
 # 步骤 2: 克隆仓库
 echo -e "\n${YELLOW}--- 步骤 2: 从 GitHub 克隆 mcp-manager 仓库 ---${NC}"
-REPO_URL="https://github.com/twj0/mcp-manage.git"
+REPO_URL="https://ghfast.top/https://github.com/twj0/mcp-manage.git"
 INSTALL_DIR="mcp-manager"
 if [ -d "$INSTALL_DIR" ]; then
     echo -e "${YELLOW}目录 '$INSTALL_DIR' 已存在。将尝试进入并更新...${NC}"
