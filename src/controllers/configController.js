@@ -2,7 +2,7 @@ import { promises as fs } from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { logger } from '../services/logger.js';
-import { ConfigError, FileError } from '../utils/errors.js';
+import { ConfigError, AppError } from '../utils/errors.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -54,7 +54,7 @@ class ConfigController {
                 return { mcpServers: {} };
             }
             logger.error(`Error reading ${filePath}:`, error);
-            throw new FileError(`Failed to read config file: ${filePath}`, error);
+            throw new AppError(`Failed to read config file: ${filePath}`, 500);
         }
     }
 

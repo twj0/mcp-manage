@@ -18,6 +18,8 @@ export const config = {
     port: process.env.PORT || 3456,
     host: process.env.HOST || 'localhost',
     nodeEnv: process.env.NODE_ENV || 'development',
+    bodyLimit: '10mb',
+    staticMaxAge: '1d'
   },
 
   // 路径配置
@@ -29,6 +31,11 @@ export const config = {
     templates: path.resolve(__dirname, '../../templates'),
     examples: path.resolve(__dirname, '../../examples'),
     logs: path.resolve(__dirname, '../../logs'),
+  },
+
+  // 应用配置
+  app: {
+    environment: process.env.NODE_ENV || 'development'
   },
 
   // MCP 配置

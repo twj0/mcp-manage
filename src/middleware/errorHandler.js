@@ -1,5 +1,5 @@
 import { logger } from '../services/logger.js';
-import { AppError, ValidationError, ConfigError, FileError, McpError } from '../utils/errors.js';
+import { AppError, ValidationError, ConfigError, McpError } from '../utils/errors.js';
 
 /**
  * 404错误处理器
@@ -52,12 +52,9 @@ export function errorHandler(error, req, res, next) {
     } else if (error instanceof ConfigError) {
         statusCode = 400;
         message = 'Configuration Error';
-    } else if (error instanceof FileError) {
-        statusCode = 500;
-        message = 'File Operation Error';
-        details = { 
-            filePath: error.filePath 
-        };
+    } else if (error.code === 'ENOENT') {
+        statusCode = 404;
+        message = 'File not found';
     } else if (error instanceof McpError) {
         statusCode = 502;
         message = 'MCP Server Error';

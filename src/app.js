@@ -8,6 +8,8 @@ import compression from 'compression';
 import config from './config/index.js';
 import { logger } from './services/logger.js';
 import apiRoutes from './routes/api.js';
+import transportRoutes from './routes/transport.js';
+import { transportService } from './services/transportService.js';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -20,6 +22,8 @@ class App {
     constructor() {
         this.app = express();
         this.port = config.server.port;
+        this.server = null;
+        this.wss = null;
         this.setupMiddleware();
         this.setupRoutes();
         this.setupErrorHandlers();
@@ -76,6 +80,10 @@ class App {
         logger.info('Mounting API routes at /api');
         this.app.use('/api', apiRoutes);
 
+        // 传输层路由 - SSE, HTTP JSON-RPC
+        logger.info('Mounting transport routes');
+        this.app.use('/', transportRoutes);
+
         // 静态文件服务
         const publicDir = path.join(__dirname, '../public');
         logger.info('Setting up static file serving from:', publicDir);
@@ -108,7 +116,7 @@ class App {
      */
     async start() {
         try {
-            const server = this.app.listen(this.port, () => {
+            this.server = this.app.listen(this.port, () => {
                 logger.info(`MCP Manager running at http://localhost:${this.port}`, {
                     environment: config.app.environment,
                     nodeVersion: process.version,
@@ -126,31 +134,60 @@ class App {
                         'POST /api/save-configs',
                         'POST /api/tools/call'
                     ],
+                    transport: [
+                        'GET  /sse',
+                        'POST /sse/rpc',
+                        'POST /mcp',
+                        'WS   /ws',
+                        'GET  /transport/stats',
+                        'GET  /transport/health',
+                        'GET  /transport/info'
+                    ],
                     static: ['/*']
                 });
             });
 
+            // 初始化WebSocket服务器
+            logger.info('Initializing WebSocket server...');
+            this.wss = transportService.initializeWebSocketServer(this.server);
+
             // 优雅关闭
             process.on('SIGTERM', () => {
                 logger.info('SIGTERM received, shutting down gracefully...');
-                server.close(() => {
-                    logger.info('Server closed.');
-                    process.exit(0);
-                });
+                this.gracefulShutdown();
             });
 
             process.on('SIGINT', () => {
                 logger.info('SIGINT received, shutting down gracefully...');
-                server.close(() => {
-                    logger.info('Server closed.');
-                    process.exit(0);
-                });
+                this.gracefulShutdown();
             });
 
-            return server;
+            return this.server;
         } catch (error) {
             logger.error('Failed to start server:', error);
             throw error;
+        }
+    }
+
+    /**
+     * 优雅关闭服务器
+     */
+    gracefulShutdown() {
+        logger.info('Starting graceful shutdown...');
+        
+        // 清理传输层连接
+        if (transportService) {
+            transportService.cleanup();
+        }
+        
+        // 关闭服务器
+        if (this.server) {
+            this.server.close(() => {
+                logger.info('HTTP server closed.');
+                process.exit(0);
+            });
+        } else {
+            process.exit(0);
         }
     }
 
