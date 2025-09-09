@@ -18,7 +18,12 @@ A Web-based GUI tool for managing Model Context Protocol (MCP) servers in Claude
 - 🔄 **Automatic Synchronization**: Configuration changes are automatically synchronized to Claude and Cursor.
 - 🛡️ **Secure Handling**: Securely handles environment variables and API keys.
 
-## 🚀 Quick Start
+##  quick start
+```bash
+bash <(curl -Ls https://raw.githubusercontent.com/twj0/mcp-manage/refs/heads/main/install.sh)
+```
+
+##  Start
 
 ### Installation
 
