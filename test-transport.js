@@ -108,8 +108,8 @@ ws.onmessage = (event) => {
 // 挂载传输层路由
 app.use('/', transportRoutes);
 
-const server = app.listen(3457, () => {
-    console.log('✅ Transport layer test server running at http://localhost:3457');
+const server = app.listen(3456, () => {
+    console.log('✅ Transport layer test server running at http://localhost:3456');
     console.log('📡 Available endpoints:');
     console.log('   GET  /           - Test page (visit in browser)');
     console.log('   GET  /sse        - Server-Sent Events');
@@ -118,7 +118,7 @@ const server = app.listen(3457, () => {
     console.log('   GET  /transport/health - Health check');
     console.log('   GET  /transport/info   - Transport info');
     console.log('');
-    console.log('🌐 Visit http://localhost:3457 in your browser for testing instructions');
+    console.log('🌐 Visit http://localhost:3456 in your browser for testing instructions');
 });
 
 // 初始化WebSocket服务器

@@ -83,6 +83,7 @@ class TransportService {
                     });
 
                 case 'tools/list':
+                    await mcpService.loadConfig();
                     const tools = await mcpService.getAllTools();
                     return this.createJsonRpcResponse(id, { tools });
 
