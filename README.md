@@ -19,6 +19,8 @@
 - **直观的Web界面** - 易于使用的图形化管理
 - **实时监控** - 连接状态和性能监控
 - **配置管理** - 环境变量和API密钥安全处理
+- **批量导入/导出** - JSON格式配置文件批量管理
+- **WebDAV备份** - 远程自动备份和恢复功能
 
 ## 📦 安装和部署
 
@@ -224,6 +226,78 @@ fetch('http://localhost:3456/sse/rpc', {
 | `NODE_ENV` | development | 运行环境 |
 | `LOG_LEVEL` | info | 日志级别 |
 | `CORS_ORIGIN` | * | CORS允许的源 |
+| `WEBDAV_URL` | - | WebDAV服务器URL |
+| `WEBDAV_USERNAME` | - | WebDAV用户名 |
+| `WEBDAV_PASSWORD` | - | WebDAV密码 |
+| `WEBDAV_AUTO_BACKUP` | false | 是否启用自动备份 |
+| `WEBDAV_BACKUP_RETENTION` | 10 | 备份保留数量 |
+
+## 💾 配置管理和备份
+
+### 批量导入/导出功能
+
+MCP Manager 提供强大的配置批量管理功能：
+
+#### 导出配置
+- **完整导出** - 导出所有服务器配置，包含元数据
+- **选择性导出** - 可选择包含或排除禁用的服务器
+- **JSON格式** - 标准化的配置文件格式
+
+```bash
+# 通过API导出配置
+curl -X GET "http://localhost:3456/api/config/export?includeDisabled=true" \
+  -H "Accept: application/json" \
+  -o config-backup.json
+```
+
+#### 导入配置
+- **文件上传** - 支持通过Web界面上传配置文件
+- **合并模式** - 将新配置与现有配置合并
+- **覆盖模式** - 完全替换现有配置
+- **验证检查** - 自动验证配置文件格式和内容
+
+```bash
+# 通过API导入配置
+curl -X POST "http://localhost:3456/api/config/import" \
+  -F "configFile=@config-backup.json" \
+  -F "mode=merge"
+```
+
+### WebDAV远程备份
+
+支持将配置自动备份到WebDAV服务器：
+
+#### 配置WebDAV
+```bash
+# 设置环境变量
+export WEBDAV_URL="https://your-webdav-server.com/dav"
+export WEBDAV_USERNAME="your-username"
+export WEBDAV_PASSWORD="your-password"
+export WEBDAV_AUTO_BACKUP="true"
+```
+
+#### 备份功能
+- **自动备份** - 配置更改时自动创建备份
+- **手动备份** - 通过Web界面或API手动备份
+- **备份列表** - 查看所有可用的备份文件
+- **一键恢复** - 从备份快速恢复配置
+- **自动清理** - 自动删除过期的备份文件
+
+```bash
+# 手动创建备份
+curl -X POST "http://localhost:3456/api/config/webdav/backup"
+
+# 查看备份列表
+curl -X GET "http://localhost:3456/api/config/webdav/backups"
+
+# 从备份恢复
+curl -X POST "http://localhost:3456/api/config/webdav/restore/backup-20241201-120000.json"
+```
+
+#### WebDAV状态监控
+- **连接状态** - 实时显示WebDAV连接状态
+- **备份历史** - 显示备份创建时间和大小
+- **错误诊断** - 详细的错误信息和解决建议
 
 ## 📊 监控和诊断
 
