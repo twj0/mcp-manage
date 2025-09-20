@@ -29,3 +29,4 @@ If you need to uninstall `mcp-manage`, simply run the following command in your 
 
 ```bash
 del-mcp-manage
+```

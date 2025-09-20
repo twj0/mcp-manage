@@ -88,7 +88,33 @@ class App {
 
         // 静态文件服务
         const publicDir = path.join(__dirname, '../public');
+        const indexPath = path.join(publicDir, 'index.html');
+        
         logger.info('Setting up static file serving from:', publicDir);
+        logger.info('Index file path:', indexPath);
+        
+        // 检查public目录和index.html是否存在
+        try {
+            const fs = require('fs');
+            if (!fs.existsSync(publicDir)) {
+                logger.error('Public directory does not exist:', publicDir);
+            } else {
+                logger.info('Public directory exists');
+                const files = fs.readdirSync(publicDir);
+                logger.info('Files in public directory:', files);
+            }
+            
+            if (!fs.existsSync(indexPath)) {
+                logger.error('Index.html does not exist:', indexPath);
+            } else {
+                logger.info('Index.html exists');
+                const stats = fs.statSync(indexPath);
+                logger.info('Index.html size:', stats.size, 'bytes');
+            }
+        } catch (error) {
+            logger.error('Error checking public files:', error);
+        }
+        
         this.app.use(express.static(publicDir, {
             maxAge: config.server.staticMaxAge,
             etag: true,
@@ -96,9 +122,22 @@ class App {
         }));
 
         // SPA路由 - 为所有其他路由提供index.html
-        this.app.get('*', (req, res) => {
+        this.app.get('*', (req, res, next) => {
             logger.debug('Serving index.html for:', req.path);
-            res.sendFile(path.join(publicDir, 'index.html'));
+            
+            // 检查文件是否存在
+            const fs = require('fs');
+            if (!fs.existsSync(indexPath)) {
+                logger.error('Index.html not found when serving:', indexPath);
+                return next(new Error(`ENOENT: no such file or directory, stat '${indexPath}'`));
+            }
+            
+            res.sendFile(indexPath, (err) => {
+                if (err) {
+                    logger.error('Error serving index.html:', err);
+                    next(err);
+                }
+            });
         });
     }
 
