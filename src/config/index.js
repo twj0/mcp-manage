@@ -15,7 +15,7 @@ const __dirname = path.dirname(__filename);
 export const config = {
   // 服务器配置
   server: {
-    port: process.env.PORT || 3456,
+    port: process.env.PORT || 11451,
     host: process.env.HOST || 'localhost',
     nodeEnv: process.env.NODE_ENV || 'development',
     bodyLimit: '10mb',

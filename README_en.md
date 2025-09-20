@@ -21,7 +21,7 @@ This script will automatically handle cloning the project, installing dependenci
 
 ## Access
 
-After successful deployment, you can access `mcp-manage` by navigating to `http://<Your-Server-IP>:3000` in your web browser.
+After successful deployment, you can access `mcp-manage` by navigating to `http://<Your-Server-IP>:11451` in your web browser.
 
 ## Uninstallation
 

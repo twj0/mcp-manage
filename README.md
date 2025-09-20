@@ -21,7 +21,7 @@ curl -sSL https://raw.githubusercontent.com/twj0/mcp-manage/main/deploy.sh | bas
 
 ## 访问方式
 
-部署成功后，您可以通过浏览器访问 `http://<您的服务器IP>:3000` 来使用 `mcp-manage`。
+部署成功后，您可以通过浏览器访问 `http://<您的服务器IP>:11451` 来使用 `mcp-manage`。
 
 ## 卸载说明
 

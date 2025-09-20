@@ -44,5 +44,5 @@ EOF
 sudo chmod +x /usr/local/bin/del-mcp-manage
 
 echo "部署完成！"
-echo "您现在可以通过 http://<您的服务器IP>:3000 访问 mcp-manage。"
+echo "您现在可以通过 http://<您的服务器IP>:11451 访问 mcp-manage。"
 echo "您可以使用 'del-mcp-manage' 命令来删除此项目。"
