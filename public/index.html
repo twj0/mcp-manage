@@ -19,6 +19,7 @@
             <button class="tab active" onclick="showView('servers', this)">Servers</button>
             <button class="tab" onclick="showView('tools', this)">Tools</button>
             <button class="tab" onclick="showView('add', this)">Add Server</button>
+            <button class="tab" onclick="showView('backup', this)">Backup & Import</button>
         </div>
 
         <!-- Add Server View -->
@@ -183,6 +184,72 @@ your-image:latest
         <!-- Tools View -->
         <div id="toolsView" style="display: none;">
             <!-- Tools will be dynamically added here -->
+        </div>
+
+        <!-- Backup & Import View -->
+        <div id="backupView" style="display: none;">
+            <div class="backup-section">
+                <h2>Configuration Backup & Import</h2>
+                
+                <!-- Export Section -->
+                <div class="section">
+                    <h3>Export Configuration</h3>
+                    <p>Download your current MCP server configuration as a JSON file.</p>
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="includeDisabled" checked>
+                            Include disabled servers
+                        </label>
+                    </div>
+                    <button onclick="exportConfig()" class="action-button">Export Configuration</button>
+                </div>
+
+                <!-- Import Section -->
+                <div class="section">
+                    <h3>Import Configuration</h3>
+                    <p>Upload a JSON configuration file to import MCP servers.</p>
+                    <div class="form-group">
+                        <label for="configFile">Select Configuration File:</label>
+                        <input type="file" id="configFile" accept=".json" onchange="handleFileSelect(event)">
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="overwriteConfig">
+                            Overwrite existing configuration (otherwise merge)
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="createBackup" checked>
+                            Create backup before import
+                        </label>
+                    </div>
+                    <button onclick="importConfig()" class="action-button" id="importBtn" disabled>Import Configuration</button>
+                </div>
+
+                <!-- WebDAV Section -->
+                <div class="section">
+                    <h3>WebDAV Backup</h3>
+                    <div id="webdavStatus" class="status-indicator">
+                        <span class="status-text">Checking WebDAV connection...</span>
+                    </div>
+                    
+                    <div class="webdav-actions">
+                        <button onclick="checkWebDAVStatus()" class="action-button">Check Connection</button>
+                        <button onclick="backupToWebDAV()" class="action-button">Backup to WebDAV</button>
+                        <button onclick="listWebDAVBackups()" class="action-button">List Backups</button>
+                        <button onclick="cleanupOldBackups()" class="action-button">Cleanup Old Backups</button>
+                    </div>
+                </div>
+
+                <!-- WebDAV Backups List -->
+                <div class="section">
+                    <h3>WebDAV Backups</h3>
+                    <div id="webdavBackupsList">
+                        <p>Click "List Backups" to see available backups.</p>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Save Button -->

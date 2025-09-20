@@ -132,7 +132,15 @@ class App {
                         'GET  /api/tools',
                         'GET  /api/tools/:serverName',
                         'POST /api/save-configs',
-                        'POST /api/tools/call'
+                        'POST /api/tools/call',
+                        'GET  /api/config/export',
+                        'POST /api/config/import',
+                        'GET  /api/config/webdav/status',
+                        'POST /api/config/webdav/backup',
+                        'GET  /api/config/webdav/backups',
+                        'POST /api/config/webdav/restore/:fileName',
+                        'DELETE /api/config/webdav/backups/:fileName',
+                        'POST /api/config/webdav/cleanup'
                     ],
                     transport: [
                         'GET  /sse',

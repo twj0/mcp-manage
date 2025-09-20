@@ -2,6 +2,7 @@ import { promises as fs } from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { logger } from '../services/logger.js';
+import webdavService from '../services/webdavService.js';
 import { ConfigError, AppError } from '../utils/errors.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -175,6 +176,17 @@ class ConfigController {
             const claudeDir = path.dirname(this.configPaths.CLAUDE_CONFIG_PATH);
             await fs.mkdir(claudeDir, { recursive: true });
             await fs.writeFile(this.configPaths.CLAUDE_CONFIG_PATH, JSON.stringify(filteredConfig, null, 2));
+
+            // 自动备份到WebDAV（如果配置了）
+            try {
+                const backupResult = await webdavService.autoBackup(fullConfig);
+                if (backupResult) {
+                    logger.info('Configuration automatically backed up to WebDAV');
+                }
+            } catch (backupError) {
+                logger.warn('Auto backup to WebDAV failed:', backupError);
+                // 不影响主要的保存操作
+            }
 
             logger.info('Successfully saved configurations');
             res.json({ 

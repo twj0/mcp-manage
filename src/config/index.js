@@ -78,6 +78,25 @@ export const config = {
     maxBodySize: '10mb',
   },
 
+  // WebDAV 配置
+  webdav: {
+    url: process.env.WEBDAV_URL || null,
+    username: process.env.WEBDAV_USERNAME || null,
+    password: process.env.WEBDAV_PASSWORD || null,
+    autoBackup: process.env.WEBDAV_AUTO_BACKUP === 'true' || false,
+    headers: {
+      'User-Agent': 'MCP-Manager/1.0.0'
+    }
+  },
+
+  // 备份配置
+  backup: {
+    enabled: process.env.BACKUP_ENABLED === 'true' || true,
+    keepCount: parseInt(process.env.BACKUP_KEEP_COUNT) || 10,
+    autoCleanup: process.env.BACKUP_AUTO_CLEANUP === 'true' || true,
+    compressionLevel: parseInt(process.env.BACKUP_COMPRESSION_LEVEL) || 6
+  },
+
   // MCP 服务器路径配置
   mcpPaths: {
     windows: {

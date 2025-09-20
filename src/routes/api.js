@@ -1,6 +1,7 @@
 import express from 'express';
 import configController from '../controllers/configController.js';
 import toolController from '../controllers/toolController.js';
+import configImportExportRoutes from './configImportExport.js';
 import { logger } from '../services/logger.js';
 
 const router = express.Router();
@@ -28,6 +29,11 @@ router.get('/tools/:serverName', (req, res) => toolController.getServerTools(req
 
 // 调用工具
 router.post('/tools/call', (req, res) => toolController.callTool(req, res));
+
+/**
+ * 配置导入导出路由
+ */
+router.use('/config', configImportExportRoutes);
 
 /**
  * 健康检查和测试路由
