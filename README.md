@@ -1,203 +1,102 @@
 # MCP Manager
 
-A powerful Web-based GUI tool for managing Model Context Protocol (MCP) servers in Claude and Cursor. It supports multiple transport protocols and provides a unified MCP proxy service, allowing AI clients to access all enabled tools by configuring just one server.
+一个功能强大的Web GUI工具，用于管理Claude和Cursor中的Model Context Protocol (MCP)服务器。支持多种传输协议，提供统一的MCP代理服务，让AI客户端只需配置一个服务器即可访问所有工具。
 
-## 🚀 Core Features
+## 🚀 核心特性
 
-### 🌐 **Complete Multi-Transport Protocol Support**
-**Now fully supports four transport methods, thoroughly tested and verified. AI clients can stably access your MCP services through any protocol!**
+### 🌐 多传输协议支持
+- **HTTP JSON-RPC** - 标准MCP协议接口，完全兼容MCP规范
+- **WebSocket** - 双向实时通信，低延迟全双工通信
+- **Server-Sent Events (SSE)** - 服务器实时消息推送
+- **传统stdio** - 命令行标准输入输出，向后兼容
 
-- **📡 SSE (Server-Sent Events)**: `GET /sse` - Server-side real-time message push, supports unidirectional communication
-- **🔄 HTTP JSON-RPC**: `POST /mcp` - Standard MCP protocol interface, fully compatible with MCP specifications, supports RESTful calls
-- **⚡ WebSocket**: `ws://host:port/ws` - Bidirectional real-time communication with low latency, supports full-duplex communication
-- **🖥️ Traditional stdio**: Command-line method - Original standard input/output method, backward compatible
+### 🎛️ 统一代理服务架构
+- **单点访问设计** - 无需在AI客户端配置多个MCP服务器
+- **工具名称格式** - `{server_name}_{tool_name}`
+- **动态配置管理** - 实时启用/禁用MCP服务器
 
-### 🎛️ **Unified Proxy Service Architecture**
-**Revolutionary single-point access design - No need to configure multiple MCP servers in AI clients, just configure one mcp-manager to access all tools!**
+### 🔧 完整的Web管理系统
+- **直观的Web界面** - 易于使用的图形化管理
+- **实时监控** - 连接状态和性能监控
+- **配置管理** - 环境变量和API密钥安全处理
 
-### 🔧 **Complete Graphical Management System**
-**Easily manage all MCP servers through an intuitive web interface, real-time monitoring of connection status**
+## 📦 安装和部署
 
-### ✅ **Verified Stability**
-**All transport layer functions have been thoroughly tested to ensure stable operation in production environments**
+### 快速开始
 
-## 🔌 **Quick Start - Four Connection Methods**
-
-### 🌆 **Method 1: HTTP JSON-RPC (Recommended✨)**
-**The simplest and most stable connection method, thoroughly tested and verified!**
-
-1. **Start mcp-manager server**:
+1. **克隆项目**
 ```bash
-cd d:\MCP\mcp-manager
-node test-transport.js  # Start on port 3456
+git clone https://github.com/twj0/mcp-manage.git
+cd mcp-manage
 ```
 
-2. **AI clients access via HTTP requests**:
-
-**Local Access Examples**:
-```
-# Initialize MCP connection
-curl -X POST http://127.0.0.1:3456/mcp \
-  -H "Content-Type: application/json" \
-  -d '{
-    "jsonrpc": "2.0",
-    "id": 1,
-    "method": "initialize",
-    "params": {
-      "protocolVersion": "2024-11-05",
-      "capabilities": {"tools": {}},
-      "clientInfo": {"name": "my-client", "version": "1.0.0"}
-    }
-  }'
-
-# Get all available tools list
-curl -X POST http://127.0.0.1:3456/mcp \
-  -H "Content-Type: application/json" \
-  -d '{
-    "jsonrpc": "2.0",
-    "id": 2,
-    "method": "tools/list",
-    "params": {}
-  }'
-
-# Call specific tool
-curl -X POST http://127.0.0.1:3456/mcp \
-  -H "Content-Type: application/json" \
-  -d '{
-    "jsonrpc": "2.0",
-    "id": 3,
-    "method": "tools/call",
-    "params": {
-      "name": "server_name_tool_name",
-      "arguments": {}
-    }
-  }'
-```
-
-**Remote VPS Access Examples**:
+2. **安装依赖**
 ```bash
-# Remote access (replace with your actual IP)
-curl -X POST http://YOUR_VPS_IP:3456/mcp \
-  -H "Content-Type: application/json" \
-  -d '{
-    "jsonrpc": "2.0",
-    "id": 1,
-    "method": "tools/list",
-    "params": {}
-  }'
+npm install
 ```
 
-### ⚡ **Method 2: WebSocket (High Performance✨)**
-**Bidirectional real-time communication, suitable for scenarios requiring frequent interaction. Verified to work perfectly!**
-
-```
-// JavaScript client example
-const ws = new WebSocket('ws://127.0.0.1:3456/ws');
-
-ws.onopen = () => {
-  console.log('✅ WebSocket connection established');
-  
-  // Send initialization request
-  ws.send(JSON.stringify({
-    "jsonrpc": "2.0",
-    "id": 1,
-    "method": "initialize",
-    "params": {
-      "protocolVersion": "2024-11-05",
-      "capabilities": {"tools": {}},
-      "clientInfo": {"name": "websocket-client", "version": "1.0.0"}
-    }
-  }));
-};
-
-ws.onmessage = (event) => {
-  const response = JSON.parse(event.data);
-  console.log('📥 Received response:', response);
-  
-  // Handle initialization response, request tools list
-  if (response.id === 1 && response.result) {
-    ws.send(JSON.stringify({
-      "jsonrpc": "2.0",
-      "id": 2,
-      "method": "tools/list",
-      "params": {}
-    }));
-  }
-};
-
-ws.onerror = (error) => {
-  console.error('❌ WebSocket error:', error);
-};
-
-ws.onclose = () => {
-  console.log('🔌 WebSocket connection closed');
-};
+3. **启动服务器**
+```bash
+npm start
 ```
 
-### 📡 **Method 3: SSE (Real-time Push✨)**
-**Server-sent event stream, suitable for scenarios requiring real-time monitoring of updates. Verified to work perfectly!**
-
+4. **访问管理界面**
 ```
-// Establish SSE connection
-const eventSource = new EventSource('http://127.0.0.1:3456/sse');
-
-eventSource.onopen = () => {
-  console.log('✅ SSE connection established');
-};
-
-eventSource.onmessage = (event) => {
-  const data = JSON.parse(event.data);
-  console.log('📥 Received server message:', data);
-  
-  if (data.type === 'connected') {
-    console.log('✅ SSE connection confirmed, client ID:', data.clientId);
-  }
-};
-
-eventSource.onerror = (error) => {
-  console.error('❌ SSE error:', error);
-};
-
-// Send JSON-RPC request via SSE endpoint
-fetch('http://127.0.0.1:3456/sse/rpc', {
-  method: 'POST',
-  headers: {'Content-Type': 'application/json'},
-  body: JSON.stringify({
-    "jsonrpc": "2.0",
-    "id": 1,
-    "method": "tools/list",
-    "params": {}
-  })
-}).then(response => response.json())
-  .then(data => console.log('🚀 Tools list:', data));
+http://localhost:3456
 ```
 
-### 🖥️ **Method 4: Traditional stdio (Backward Compatible)**
-**Original functionality remains unchanged, fully compatible with older versions**
+### 生产环境部署
 
-1. Configure your MCP servers in [`config.json`](config.json)
-2. Add this server to your AI client:
+1. **使用PM2管理进程**
+```bash
+# 启动服务
+npm run cli start
+
+# 查看状态
+npm run cli status
+
+# 停止服务
+npm run cli stop
+
+# 重启服务
+npm run cli restart
+```
+
+2. **环境变量配置**
+```bash
+# 设置端口
+export PORT=3456
+
+# 设置环境
+export NODE_ENV=production
+
+# 设置CORS
+export CORS_ORIGIN="*"
+
+# 设置日志级别
+export LOG_LEVEL=info
+```
+
+## 🔌 使用方法
+
+### 方法1: HTTP JSON-RPC (推荐)
+
+**AI客户端配置示例:**
 ```json
 {
   "mcpServers": {
     "mcp-manager": {
-      "command": "node",
-      "args": ["path/to/mcp-manager/bin/mcp-server.js"]
+      "transport": "http",
+      "url": "http://localhost:3456/mcp"
     }
   }
 }
 ```
-3. Use tools with prefixed names: `{server_name}_{tool_name}`
-4. Dynamically manage servers through the web interface
 
-### Method 2: HTTP JSON-RPC Method (New ✨)
-
-1. Start mcp-manager server: `npm start`
-2. AI clients access via HTTP requests:
-
-```
-# Local access
-curl -X POST http://127.0.0.1:3456/mcp \
+**直接API调用:**
+```bash
+# 获取所有工具列表
+curl -X POST http://localhost:3456/mcp \
   -H "Content-Type: application/json" \
   -d '{
     "jsonrpc": "2.0",
@@ -206,25 +105,29 @@ curl -X POST http://127.0.0.1:3456/mcp \
     "params": {}
   }'
 
-# Remote VPS access
-curl -X POST http://YOUR_VPS_IP:3456/mcp \
+# 调用特定工具
+curl -X POST http://localhost:3456/mcp \
   -H "Content-Type: application/json" \
   -d '{
     "jsonrpc": "2.0",
-    "id": 1,
-    "method": "tools/list",
-    "params": {}
+    "id": 2,
+    "method": "tools/call",
+    "params": {
+      "name": "feedback-enhance_analyze_feedback",
+      "arguments": {
+        "feedback": "这个代码写得不好"
+      }
+    }
   }'
 ```
 
-### Method 3: WebSocket Method (New ⚡)
+### 方法2: WebSocket
 
 ```javascript
-// JavaScript client example
-const ws = new WebSocket('ws://127.0.0.1:3456/ws');
+const ws = new WebSocket('ws://localhost:3456/ws');
 
 ws.onopen = () => {
-  // Send initialization request
+  // 发送初始化请求
   ws.send(JSON.stringify({
     "jsonrpc": "2.0",
     "id": 1,
@@ -239,23 +142,23 @@ ws.onopen = () => {
 
 ws.onmessage = (event) => {
   const response = JSON.parse(event.data);
-  console.log('Received response:', response);
+  console.log('收到响应:', response);
 };
 ```
 
-### Method 4: SSE Method (New 📡)
+### 方法3: Server-Sent Events
 
 ```javascript
-// Establish SSE connection
-const eventSource = new EventSource('http://127.0.0.1:3456/sse');
+// 建立SSE连接
+const eventSource = new EventSource('http://localhost:3456/sse');
 
 eventSource.onmessage = (event) => {
   const data = JSON.parse(event.data);
-  console.log('Received server message:', data);
+  console.log('服务器消息:', data);
 };
 
-// Send JSON-RPC request
-fetch('http://127.0.0.1:3456/sse/rpc', {
+// 发送JSON-RPC请求
+fetch('http://localhost:3456/sse/rpc', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({
@@ -267,412 +170,156 @@ fetch('http://127.0.0.1:3456/sse/rpc', {
 });
 ```
 
-## 🛠️ **Transport Layer Management Endpoints - Comprehensive Monitoring**
+### 方法4: 传统stdio
 
-Access the following endpoints to manage and monitor transport layer services. All endpoints have been tested and verified:
-
-### 🚑 **Health Check Endpoint**
-```bash
-curl -s http://localhost:3456/transport/health
-
-# Expected response:
-{
-  "status": "healthy",
-  "transports": {
-    "sse": "available",
-    "http_jsonrpc": "available",
-    "websocket": "available"
-  },
-  "timestamp": "2025-09-09T05:01:40.817Z"
-}
-```
-
-### 📊 **Transport Layer Info Endpoint**
-```bash
-curl -s http://localhost:3456/transport/info
-
-# Expected response:
-{
-  "name": "MCP Manager Transport Layer",
-  "version": "1.0.0",
-  "endpoints": {
-    "sse": {
-      "url": "http://localhost:3456/sse",
-      "description": "Server-Sent Events endpoint for real-time communication",
-      "methods": ["GET"]
-    },
-    "sse_rpc": {
-      "url": "http://localhost:3456/sse/rpc",
-      "description": "JSON-RPC over SSE endpoint",
-      "methods": ["POST"]
-    },
-    "http_jsonrpc": {
-      "url": "http://localhost:3456/mcp",
-      "description": "Standard HTTP JSON-RPC endpoint",
-      "methods": ["POST"]
-    },
-    "websocket": {
-      "url": "ws://localhost:3456/ws",
-      "description": "WebSocket endpoint for bidirectional communication",
-      "methods": ["WebSocket"]
-    }
-  },
-  "capabilities": {
-    "tools": true,
-    "resources": false,
-    "prompts": false
-  },
-  "protocolVersion": "2024-11-05"
-}
-```
-
-### 📊 **Connection Statistics Endpoint**
-```bash
-curl -s http://localhost:3456/transport/stats
-
-# Expected response:
-{
-  "success": true,
-  "data": {
-    "sse": {
-      "count": 1,
-      "clients": ["sse_1757393541933_56vimemt9"]
-    },
-    "websocket": {
-      "count": 0,
-      "clients": []
-    }
-  },
-  "timestamp": "2025-09-09T04:57:53.467Z"
-}
-```
-
-### 🔍 **Real-time Testing Examples**
-**You can directly run these commands to verify all functions:**
-
-```bash
-# 1. Test HTTP JSON-RPC initialization
-echo '{
-  "jsonrpc": "2.0",
-  "id": 1,
-  "method": "initialize",
-  "params": {
-    "protocolVersion": "2024-11-05",
-    "capabilities": {"tools": {}},
-    "clientInfo": {"name": "test-client", "version": "1.0.0"}
-  }
-}' | curl -X POST http://localhost:3456/mcp \
-  -H "Content-Type: application/json" \
-  -d @-
-
-# 2. Test tools list retrieval
-echo '{
-  "jsonrpc": "2.0",
-  "id": 2,
-  "method": "tools/list",
-  "params": {}
-}' | curl -X POST http://localhost:3456/mcp \
-  -H "Content-Type: application/json" \
-  -d @-
-
-# 3. Check service health status
-curl -s http://localhost:3456/transport/health | jq .
-
-# 4. View connection statistics
-curl -s http://localhost:3456/transport/stats | jq .
-```
-
-## 📋 Main Features
-
-- 🎛️ Enable/disable MCP servers with simple toggle switches
-- 🔄 Changes automatically sync between Claude and Cursor
-- 🛠️ View available tools for each server
-- 🔒 Securely handle environment variables and API keys
-- 📱 Responsive design for any screen size
-- 🌐 Support for local and remote VPS deployment
-- 📡 Multiple transport protocol support (stdio, HTTP, WebSocket, SSE)
-
-## 🚀 Installation & Deployment
-
-### Local Installation
-
-1. Clone this repository:
-```bash
-git clone https://github.com/twj0/mcp-manage.git
-cd mcp-manage
-```
-
-2. Install dependencies:
-```bash
-npm install
-```
-
-3. Create configuration file:
-```bash
-cp config/config.example.json config.json
-```
-
-4. Start the server:
-```bash
-npm start
-```
-
-5. Open [`http://localhost:3456`](http://localhost:3456) in your browser
-
-### Remote VPS Deployment
-
-```bash
-# Use custom port
-PORT=8080 npm start
-
-# Use PM2 process management (recommended for production)
-npm install -g pm2
-pm2 start npm --name "mcp-manager" -- start
-pm2 startup
-pm2 save
-```
-
-## ⚙️ Configuration
-
-MCP Server Manager uses the following configuration files:
-
-- [`config.json`](config.json): Main server configuration file
-- Claude configuration:
-  - macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
-  - Windows: `%APPDATA%\Claude\claude_desktop_config.json`
-  - Linux: `~/.config/Claude/claude_desktop_config.json`
-- Cursor configuration:
-  - macOS: `~/Library/Application Support/Cursor/User/globalStorage/saoudrizwan.claude-dev/settings/cline_mcp_settings.json`
-  - Windows: `%APPDATA%\Cursor\User\globalStorage\saoudrizwan.claude-dev\settings\cline_mcp_settings.json`
-  - Linux: `~/.config/Cursor/User/globalStorage/saoudrizwan.claude-dev/settings/cline_mcp_settings.json`
-
-### Configuration Example
-
-```
+```json
 {
   "mcpServers": {
-    "example-server": {
+    "mcp-manager": {
       "command": "node",
-      "args": ["/path/to/server.js"],
+      "args": ["path/to/mcp-manager/bin/mcp-server.js"]
+    }
+  }
+}
+```
+
+## ⚙️ 配置管理
+
+### MCP服务器配置
+
+编辑 `config.json` 文件添加MCP服务器:
+
+```json
+{
+  "mcpServers": {
+    "feedback-enhance": {
+      "command": "node",
+      "args": ["D:\\MCP\\mcp-manager\\examples\\feedback-enhance-mcp\\index.js"],
       "env": {
-        "API_KEY": "your-api-key"
+        "FEEDBACK_MODEL": "enhanced",
+        "ANALYSIS_DEPTH": "detailed"
       }
     },
-    "remote-server": {
-      "transport": "sse",
-      "url": "https://api.example.com/mcp/sse",
-      "auth": {
-        "type": "bearer",
-        "value": "your-bearer-token"
+    "filesystem": {
+      "command": "node",
+      "args": ["/path/to/filesystem/dist/index.js", "/allowed/directory"]
+    },
+    "github": {
+      "command": "node",
+      "args": ["/path/to/github/dist/index.js"],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "your-token-here"
       }
     }
   }
 }
 ```
 
-## 📚 Usage
+### 环境变量
 
-### Web Interface Management
+| 变量名 | 默认值 | 说明 |
+|--------|--------|------|
+| `PORT` | 3456 | 服务器端口 |
+| `HOST` | localhost | 服务器主机 |
+| `NODE_ENV` | development | 运行环境 |
+| `LOG_LEVEL` | info | 日志级别 |
+| `CORS_ORIGIN` | * | CORS允许的源 |
 
-1. Start MCP Server Manager
-2. Open the management interface in your browser
-3. Use toggle switches to enable/disable servers
-4. Click "Save Changes" to apply your changes
-5. Configuration automatically syncs to Claude and Cursor
+## 📊 监控和诊断
 
-### 💻 **Complete API Call Testing Examples**
-**All examples have been tested and verified in practice, ready to use directly:**
-
+### 健康检查
 ```bash
-# Initialize connection - Test successful ✅
+curl http://localhost:3456/transport/health
+```
+
+### 连接统计
+```bash
+curl http://localhost:3456/transport/stats
+```
+
+### 服务信息
+```bash
+curl http://localhost:3456/transport/info
+```
+
+## 🛠️ 内置MCP服务器
+
+项目包含以下示例MCP服务器:
+
+### feedback-enhance-mcp
+反馈分析和增强工具，提供:
+- `analyze_feedback` - 分析反馈质量
+- `enhance_feedback` - 智能增强反馈内容
+- `suggest_feedback_improvements` - 提供改进建议
+- `generate_feedback_template` - 生成反馈模板
+- `feedback_sentiment_score` - 情感倾向评估
+
+### 使用示例
+```bash
+# 分析反馈
 curl -X POST http://localhost:3456/mcp \
   -H "Content-Type: application/json" \
   -d '{
     "jsonrpc": "2.0",
     "id": 1,
-    "method": "initialize",
-    "params": {
-      "protocolVersion": "2024-11-05",
-      "capabilities": {"tools": {}},
-      "clientInfo": {"name": "test-client", "version": "1.0.0"}
-    }
-  }'
-
-# Expected response:
-# {"jsonrpc":"2.0","id":1,"result":{"protocolVersion":"2024-11-05","capabilities":{"tools":{},"resources":{},"prompts":{}},"serverInfo":{"name":"mcp-manager","version":"1.0.0"}}}
-
-# Get tools list - Test successful ✅
-curl -X POST http://localhost:3456/mcp \
-  -H "Content-Type: application/json" \
-  -d '{
-    "jsonrpc": "2.0",
-    "id": 2,
-    "method": "tools/list",
-    "params": {}
-  }'
-
-# Expected response:
-# {"jsonrpc":"2.0","id":2,"result":{"tools":[]}}
-
-# Call tool (example)
-curl -X POST http://localhost:3456/mcp \
-  -H "Content-Type: application/json" \
-  -d '{
-    "jsonrpc": "2.0",
-    "id": 3,
     "method": "tools/call",
     "params": {
-      "name": "example-server_some-tool",
+      "name": "feedback-enhance_analyze_feedback",
       "arguments": {
-        "param1": "value1",
-        "param2": "value2"
+        "feedback": "这个代码写得不好，有很多问题。"
       }
     }
   }'
 ```
 
-### 🔌 **Complete WebSocket Testing Example**
-**Verified working WebSocket test code:**
+## 🔧 开发和扩展
 
+### 项目结构
 ```
-// Save as test-websocket.js and run: node test-websocket.js
-import WebSocket from 'ws';
-
-const ws = new WebSocket('ws://localhost:3456/ws');
-
-ws.on('open', function open() {
-    console.log('✅ WebSocket connection established');
-    
-    const initRequest = {
-        "jsonrpc": "2.0",
-        "id": 1,
-        "method": "initialize",
-        "params": {
-            "protocolVersion": "2024-11-05",
-            "capabilities": {"tools": {}},
-            "clientInfo": {"name": "websocket-test-client", "version": "1.0.0"}
-        }
-    };
-    
-    console.log('📤 Sending initialization request...');
-    ws.send(JSON.stringify(initRequest));
-});
-
-ws.on('message', function message(data) {
-    const response = JSON.parse(data.toString());
-    console.log('📥 Received message:', response);
-    
-    if (response.id === 1 && response.result) {
-        console.log('✅ Initialization successful, requesting tools list...');
-        const toolsRequest = {
-            "jsonrpc": "2.0",
-            "id": 2,
-            "method": "tools/list",
-            "params": {}
-        };
-        ws.send(JSON.stringify(toolsRequest));
-    } else if (response.id === 2) {
-        console.log('✅ Tools list retrieval complete');
-        console.log('🔧 Available tools count:', response.result?.tools?.length || 0);
-        ws.close();
-    }
-});
-
-ws.on('close', function close() {
-    console.log('🔌 WebSocket connection closed');
-    process.exit(0);
-});
+mcp-manager/
+├── src/                    # 核心源代码
+│   ├── app.js             # 主应用程序
+│   ├── config/            # 配置管理
+│   ├── services/          # 核心服务
+│   ├── routes/            # 路由定义
+│   ├── controllers/       # 控制器
+│   └── middleware/        # 中间件
+├── examples/              # 示例MCP服务器
+├── public/                # Web界面文件
+├── config/                # 配置文件
+├── bin/                   # 可执行文件
+└── scripts/               # 辅助脚本
 ```
 
-### 🌐 **Web Management Interface Access**
-**Open the following addresses in your browser to access the complete management interface:**
-- **Local Access**: [`http://localhost:3456`](http://localhost:3456)
-- **Test Page**: Contains detailed testing guides for all transport layer functions
+### 添加新的MCP服务器
 
-## 📊 **Test Validation Results**
+1. 在 `examples/` 目录创建新的MCP服务器
+2. 在 `config.json` 中添加配置
+3. 通过Web界面启用服务器
+4. 工具将自动以 `{server_name}_{tool_name}` 格式可用
 
-### ✅ **Comprehensive Testing Verification**
-**All transport layer functions have been thoroughly tested to ensure stable operation in production environments:**
+### API开发
 
-#### 🔄 **HTTP JSON-RPC Test** - ✅ Success
-- Initialization request: `{"jsonrpc":"2.0","id":1,"result":{"protocolVersion":"2024-11-05"...}}`
-- Tools list: `{"jsonrpc":"2.0","id":2,"result":{"tools":[]}}`
-- Status: Fully operational ✅
+项目提供完整的REST API:
+- `GET /api/health` - 健康检查
+- `GET /api/tools` - 获取所有工具
+- `POST /api/tools/call` - 调用工具
+- `GET /api/cursor-config` - 获取Cursor配置
+- `GET /api/claude-config` - 获取Claude配置
 
-#### ⚡ **WebSocket Test** - ✅ Success  
-- Connection establishment: Received connection confirmation message
-- Bidirectional communication: JSON-RPC message processing correct
-- Status: Fully operational ✅
+## 📝 许可证
 
-#### 📡 **SSE Test** - ✅ Success
-- SSE connection: Successfully established
-- Server push: Connection confirmation message
-- Status: Fully operational ✅
+MIT License - 详见 [LICENSE](LICENSE) 文件
 
-#### 🛠️ **Management Endpoints Test** - ✅ All Success
-- Health check: `/transport/health` ✅
-- Transport info: `/transport/info` ✅  
-- Connection stats: `/transport/stats` ✅
+## 🤝 贡献
 
-#### 🌐 **Web Management Interface** - ✅ Success
-- Server address: `http://localhost:3456`
-- Status: Started and accessible ✅
+欢迎提交Issue和Pull Request！
 
-### 🚀 **Deployment Status**
-- **Server Address**: `http://localhost:3456`
-- **Available Transport Methods**:
-  - HTTP JSON-RPC: `POST http://localhost:3456/mcp`
-  - WebSocket: `ws://localhost:3456/ws`
-  - SSE: `http://localhost:3456/sse`
-- **Configured Server Count**: 8 (example-server, airtable, brave-search, github, google-maps, filesystem, perplexity, feedback-enhance)
-- **Current Tool Count**: 0 (server configuration needs adjustment to retrieve actual tools)
+## 📞 支持
 
-### 🎆 **Conclusion**
+- GitHub Issues: [提交问题](https://github.com/twj0/mcp-manage/issues)
+- 文档: [查看文档](https://github.com/twj0/mcp-manage#readme)
 
-**🎉 Your MCP Manager is now fully operational!** 
+---
 
-🔥 **All transport layer functions are working properly**:
-- ✅ Multi-protocol support (HTTP, WebSocket, SSE)
-- ✅ JSON-RPC message processing
-- ✅ Connection management and heartbeat mechanism  
-- ✅ Configuration file loading
-- ✅ Web management interface
-
-🚀 **Now your AI clients can connect to your MCP Manager through any of the following methods**:
-
-1. **HTTP method**: `http://127.0.0.1:3456/mcp`
-2. **WebSocket method**: `ws://127.0.0.1:3456/ws`  
-3. **SSE method**: `http://127.0.0.1:3456/sse`
-
-🌎 **Your configured MCP client configuration files should now be able to successfully connect and use these transport layer functions!**
-
-## 🏷️ Keywords
-
-- Model Context Protocol (MCP)
-- Claude AI / Anthropic Claude
-- Cursor Editor
-- MCP Server Management
-- AI Tool Management
-- Multi-Transport Protocol Support
-- WebSocket / SSE / HTTP JSON-RPC
-- VPS Remote Deployment
-- Unified Proxy Service
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [`LICENSE`](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- Built specifically for Anthropic's Claude AI
-- Compatible with Cursor Editor
-- Uses Model Context Protocol (MCP)
-- Supports multiple modern transport protocols
+**MCP Manager** - 让MCP服务器管理变得简单高效！

@@ -9,12 +9,12 @@
     "mcp-server": "./bin/mcp-server.js"
   },
   "scripts": {
-    "start": "node index.js",
-    "dev": "nodemon index.js",
+    "start": "node start-web-server.js",
+    "dev": "nodemon start-web-server.js",
     "mcp": "node bin/mcp-server.js",
-    "mcp-proxy": "node scripts/start-mcp-proxy.js",
-    "test": "node scripts/test-proxy.js",
-    "test-proxy": "node scripts/test-proxy.js",
+    "web": "node start-web-server.js",
+    "cli": "node index.js",
+    "deploy": "node deploy.js",
     "verify-config": "node scripts/verify-config.js",
     "build": "echo 'No build step required for Node.js application'",
     "lint": "echo 'ESLint not configured yet'",
@@ -44,7 +44,9 @@
     "cors": "^2.8.5",
     "express": "^4.18.2",
     "helmet": "^7.1.0",
+    "multer": "^1.4.5-lts.1",
     "pm2": "^6.0.10",
+    "webdav": "^5.3.0",
     "ws": "^8.14.2"
   },
   "devDependencies": {
