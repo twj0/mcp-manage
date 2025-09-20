@@ -862,9 +862,32 @@ input:checked + .slider:before {
     color: #666;
 }
 
-.backup-actions-item {
+.backup-actions {
     display: flex;
     gap: 0.5rem;
+}
+
+.backup-meta {
+    font-size: 0.85rem;
+    color: #666;
+    margin-top: 0.25rem;
+}
+
+.backup-meta span {
+    margin-right: 1rem;
+}
+
+.action-button.small {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.85rem;
+}
+
+.action-button.danger {
+    background-color: var(--error-color);
+}
+
+.action-button.danger:hover {
+    background-color: #d32f2f;
 }
 
 .restore-btn {

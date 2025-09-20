@@ -140,10 +140,16 @@ function showView(view, clickedTab) {
     document.getElementById('serversView').style.display = view === 'servers' ? 'grid' : 'none';
     document.getElementById('toolsView').style.display = view === 'tools' ? 'block' : 'none';
     document.getElementById('addView').style.display = view === 'add' ? 'block' : 'none';
+    document.getElementById('backupView').style.display = view === 'backup' ? 'block' : 'none';
 
     // Refresh tools view when switching to it
     if (view === 'tools') {
         renderTools();
+    }
+    
+    // Check WebDAV status when switching to backup view
+    if (view === 'backup') {
+        checkWebDAVStatus();
     }
 }
 
@@ -303,7 +309,13 @@ async function saveChanges() {
 
 // Initialize the app
 console.log('Initializing MCP Manager...');
-window.onload = loadConfigs;
+window.onload = async function() {
+    await loadConfigs();
+    // 检查WebDAV状态（如果在备份页面）
+    if (document.getElementById('backupView').style.display !== 'none') {
+        await checkWebDAVStatus();
+    }
+};
 
 // Add Server Functions
 function addEnvVar() {
@@ -883,7 +895,308 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
+/**
+ * 配置导出功能
+ */
+async function exportConfig() {
+    try {
+        const includeDisabled = document.getElementById('includeDisabled').checked;
+        const response = await fetch(`/api/config/export?includeDisabled=${includeDisabled}`);
+        
+        if (!response.ok) {
+            throw new Error(`Export failed: ${response.status}`);
+        }
+        
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        a.download = `mcp-config-${new Date().toISOString().split('T')[0]}.json`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+        
+        showMessage('Configuration exported successfully!', false);
+    } catch (error) {
+        console.error('Export error:', error);
+        showMessage(`Export failed: ${error.message}`);
+    }
+}
+
+/**
+ * 处理文件选择
+ */
+function handleFileSelect(event) {
+    const file = event.target.files[0];
+    const importBtn = document.getElementById('importBtn');
+    
+    if (file && file.type === 'application/json') {
+        importBtn.disabled = false;
+        showMessage(`File selected: ${file.name}`, false);
+    } else {
+        importBtn.disabled = true;
+        if (file) {
+            showMessage('Please select a valid JSON file.');
+        }
+    }
+}
+
+/**
+ * 配置导入功能
+ */
+async function importConfig() {
+    const fileInput = document.getElementById('configFile');
+    const file = fileInput.files[0];
+    
+    if (!file) {
+        showMessage('Please select a file to import.');
+        return;
+    }
+    
+    const formData = new FormData();
+    formData.append('configFile', file);
+    formData.append('overwrite', document.getElementById('overwriteConfig').checked);
+    formData.append('createBackup', document.getElementById('createBackup').checked);
+    
+    try {
+        const response = await fetch('/api/config/import', {
+            method: 'POST',
+            body: formData
+        });
+        
+        const result = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(result.error || 'Import failed');
+        }
+        
+        showMessage(`Import successful! ${result.message}`, false);
+        
+        // 重新加载配置
+        await loadConfigs();
+        renderServers();
+        
+        // 清除文件选择
+        fileInput.value = '';
+        document.getElementById('importBtn').disabled = true;
+        
+    } catch (error) {
+        console.error('Import error:', error);
+        showMessage(`Import failed: ${error.message}`);
+    }
+}
+
+/**
+ * 检查WebDAV连接状态
+ */
+async function checkWebDAVStatus() {
+    const statusDiv = document.getElementById('webdavStatus');
+    const statusText = statusDiv.querySelector('.status-text');
+    
+    statusDiv.className = 'status-indicator checking';
+    statusText.textContent = 'Checking WebDAV connection...';
+    
+    try {
+        const response = await fetch('/api/config/webdav/status');
+        const result = await response.json();
+        
+        if (result.connected) {
+            statusDiv.className = 'status-indicator connected';
+            statusText.textContent = `Connected to WebDAV (${result.url})`;
+        } else {
+            statusDiv.className = 'status-indicator disconnected';
+            statusText.textContent = result.error || 'WebDAV not configured or connection failed';
+        }
+    } catch (error) {
+        console.error('WebDAV status check error:', error);
+        statusDiv.className = 'status-indicator disconnected';
+        statusText.textContent = `Connection check failed: ${error.message}`;
+    }
+}
+
+/**
+ * 备份到WebDAV
+ */
+async function backupToWebDAV() {
+    try {
+        const response = await fetch('/api/config/webdav/backup', {
+            method: 'POST'
+        });
+        
+        const result = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(result.error || 'Backup failed');
+        }
+        
+        showMessage(`Backup successful! File: ${result.filename}`, false);
+        
+        // 自动刷新备份列表
+        await listWebDAVBackups();
+        
+    } catch (error) {
+        console.error('WebDAV backup error:', error);
+        showMessage(`Backup failed: ${error.message}`);
+    }
+}
+
+/**
+ * 列出WebDAV备份
+ */
+async function listWebDAVBackups() {
+    const backupsList = document.getElementById('webdavBackupsList');
+    backupsList.innerHTML = '<p>Loading backups...</p>';
+    
+    try {
+        const response = await fetch('/api/config/webdav/backups');
+        const result = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(result.error || 'Failed to list backups');
+        }
+        
+        if (result.backups && result.backups.length > 0) {
+            const backupsHtml = result.backups.map(backup => `
+                <div class="backup-item">
+                    <div class="backup-info">
+                        <strong>${backup.filename}</strong>
+                        <div class="backup-meta">
+                            <span>Size: ${formatFileSize(backup.size)}</span>
+                            <span>Date: ${new Date(backup.lastmod).toLocaleString()}</span>
+                        </div>
+                    </div>
+                    <div class="backup-actions">
+                        <button onclick="restoreFromWebDAV('${backup.filename}')" class="action-button small">Restore</button>
+                        <button onclick="deleteWebDAVBackup('${backup.filename}')" class="action-button small danger">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+            
+            backupsList.innerHTML = backupsHtml;
+        } else {
+            backupsList.innerHTML = '<p>No backups found.</p>';
+        }
+        
+    } catch (error) {
+        console.error('List backups error:', error);
+        backupsList.innerHTML = `<p class="error">Failed to load backups: ${error.message}</p>`;
+    }
+}
+
+/**
+ * 从WebDAV恢复配置
+ */
+async function restoreFromWebDAV(filename) {
+    if (!confirm(`Are you sure you want to restore from backup "${filename}"? This will overwrite your current configuration.`)) {
+        return;
+    }
+    
+    try {
+        const response = await fetch(`/api/config/webdav/restore/${encodeURIComponent(filename)}`, {
+            method: 'POST'
+        });
+        
+        const result = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(result.error || 'Restore failed');
+        }
+        
+        showMessage(`Configuration restored from ${filename}!`, false);
+        
+        // 重新加载配置
+        await loadConfigs();
+        renderServers();
+        
+    } catch (error) {
+        console.error('WebDAV restore error:', error);
+        showMessage(`Restore failed: ${error.message}`);
+    }
+}
+
+/**
+ * 删除WebDAV备份
+ */
+async function deleteWebDAVBackup(filename) {
+    if (!confirm(`Are you sure you want to delete backup "${filename}"? This action cannot be undone.`)) {
+        return;
+    }
+    
+    try {
+        const response = await fetch(`/api/config/webdav/backups/${encodeURIComponent(filename)}`, {
+            method: 'DELETE'
+        });
+        
+        const result = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(result.error || 'Delete failed');
+        }
+        
+        showMessage(`Backup "${filename}" deleted successfully!`, false);
+        
+        // 刷新备份列表
+        await listWebDAVBackups();
+        
+    } catch (error) {
+        console.error('Delete backup error:', error);
+        showMessage(`Delete failed: ${error.message}`);
+    }
+}
+
+/**
+ * 清理旧备份
+ */
+async function cleanupOldBackups() {
+    if (!confirm('This will delete backups older than 30 days. Continue?')) {
+        return;
+    }
+    
+    try {
+        const response = await fetch('/api/config/webdav/cleanup', {
+            method: 'POST'
+        });
+        
+        const result = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(result.error || 'Cleanup failed');
+        }
+        
+        showMessage(`Cleanup completed! Deleted ${result.deletedCount} old backups.`, false);
+        
+        // 刷新备份列表
+        await listWebDAVBackups();
+        
+    } catch (error) {
+        console.error('Cleanup error:', error);
+        showMessage(`Cleanup failed: ${error.message}`);
+    }
+}
+
+/**
+ * 格式化文件大小
+ */
+function formatFileSize(bytes) {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
+
 // Export functions for global access
 window.showView = showView;
 window.toggleServer = toggleServer;
 window.saveChanges = saveChanges;
+window.exportConfig = exportConfig;
+window.importConfig = importConfig;
+window.handleFileSelect = handleFileSelect;
+window.checkWebDAVStatus = checkWebDAVStatus;
+window.backupToWebDAV = backupToWebDAV;
+window.listWebDAVBackups = listWebDAVBackups;
+window.restoreFromWebDAV = restoreFromWebDAV;
+window.deleteWebDAVBackup = deleteWebDAVBackup;
+window.cleanupOldBackups = cleanupOldBackups;
