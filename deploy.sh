@@ -28,11 +28,6 @@ echo -e "${GREEN}### mcp-manager 全自动部署脚本 ###${NC}"
 
 # 步骤 0: 检查用户权限
 echo -e "\n${YELLOW}--- 步骤 0: 检查用户权限 ---${NC}"
-if [ "$EUID" -eq 0 ]; then
-    echo -e "${RED}⚠️  请不要使用 root 用户运行此脚本，否则可能导致权限问题。${NC}"
-    echo -e "${RED}请切换到普通用户后再次运行。${NC}"
-    exit 1
-fi
 echo -e "${GREEN}用户权限检查通过。${NC}"
 
 # 步骤 1: 检查并安装系统依赖 (Git, Node.js, npm, PM2)
